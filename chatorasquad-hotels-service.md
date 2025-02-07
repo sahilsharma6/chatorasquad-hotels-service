@@ -1,0 +1,1 @@
+chatorasquad-hotels-service
