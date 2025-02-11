@@ -37,9 +37,9 @@ const DashboardLayout = ({}) => {
         </button>
 
         <nav>
-          <NavItem icon={<Home size={20} />} label="Profile" isOpen={isOpen}  path={'/'+hotelName+'/profile?token='+tok} pathname='profile' />
-          <NavItem icon={<Calendar size={20} />} label="Kitchen" isOpen={isOpen} path={'/'+hotelName+'/profile/kitchen/?token='+tok} pathname='kitchen' />
-          <NavItem icon={<Building2 size={20} />} label="Room" isOpen={isOpen} path={'/'+hotelName+'/profile/room/?token='+tok} pathname='room' />
+          <NavItem icon={<Home size={20} />} label="Profile" isOpen={isOpen}  path={'/'+hotelName+'/profile?token='+tok} pathname={'/'+hotelName+'/profile/'} />
+          {/* <NavItem icon={<Calendar size={20} />} label="Kitchen" isOpen={isOpen} path={'/'+hotelName+'/profile/kitchen/?token='+tok} pathname={'/'+hotelName+'/profile/kitchen'}  /> */}
+          <NavItem icon={<Building2 size={20} />} label="Room" isOpen={isOpen} path={'/'+hotelName+'/profile/room/?token='+tok} pathname={'/'+hotelName+'/profile/room'}  />
         </nav>
       </div>
 
@@ -73,7 +73,7 @@ const DashboardLayout = ({}) => {
          <Routes>
           <Route path='/' element={<Profile />} ></Route>
           <Route path='/room' element={<Room />} ></Route>
-          <Route path='/kitchen' element={<Kittchen />} ></Route>
+          {/* <Route path='/kitchen' element={<Kittchen />} ></Route> */}
          </Routes>
         </main>
       </div>
@@ -81,25 +81,28 @@ const DashboardLayout = ({}) => {
   );
 };
 
-const NavItem = ({ icon, label, isOpen, active ,path,pathname}) => {
-  const location=useLocation()
-  const pathName=location.pathname.split('/')
-  console.log(pathName);
-  
-  console.log(pathName[pathName.length-2]);
-  const getPath=pathName[pathName.length-2]
-  return(
-  
-   <Link to={path}><div className={`
-    flex items-center p-3 mb-2 rounded-lg cursor-pointer
-    ${ pathname==getPath ? 'bg-orange-500 text-white' : 'text-gray-400 hover:bg-slate-800'}
-    transition-all duration-200
-  `}>
- {icon}  {isOpen && <span className="ml-3">{label}</span>}
-   
-  </div></Link> 
-);
-}
+const NavItem = ({ icon, label, isOpen, path, pathname }) => {
+  const location = useLocation();
+
+  // Normalize paths by trimming trailing slashes
+  const currentPath = location.pathname.replace(/\/$/, "");
+  const targetPath = pathname.replace(/\/$/, "");
+
+  const isActive = currentPath === targetPath;
+
+  return (
+    <Link to={path}>
+      <div
+        className={`flex items-center p-3 mb-2 rounded-lg cursor-pointer ${
+          isActive ? "bg-orange-500 text-white" : "text-gray-400 hover:bg-slate-800"
+        } transition-all duration-200`}
+      >
+        {icon} {isOpen && <span className="ml-3">{label}</span>}
+      </div>
+    </Link>
+  );
+};
+
 
 
 export default DashboardLayout;
