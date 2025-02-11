@@ -1,72 +1,24 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-
-const DarkModeContext = createContext();
-
-export const DarkModeProvider = ({ children }) => {
-  const [darkMode, setDarkMode] = useState(
-    localStorage.getItem("darkMode") === "true"
-  );
-
-  useEffect(() => {
-    localStorage.setItem("darkMode", darkMode);
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-  }, [darkMode]);
-
-  return (
-    <DarkModeContext.Provider value={{ darkMode, setDarkMode }}>
-      {children}
-    </DarkModeContext.Provider>
-  );
-};
-
-export const useDarkMode = () => useContext(DarkModeContext);
-
-
-
-import React from "react";
-import { DarkModeProvider } from "./context/DarkModeProvider";
-import HomePage from "./pages/HomePage";
-
-function App() {
-  return (
-    <DarkModeProvider>
-      <HomePage />
-    </DarkModeProvider>
-  );
-}
-
-export default App;
-
-
-
-import React, { useState } from "react";
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { MapPin, Hotel, Phone, CheckCircle, Search, Moon, Sun } from "lucide-react";
-import { Link } from "react-router-dom";
-import { hotels } from "@/data/hotel-data";
-import { useDarkMode } from "@/context/DarkModeProvider"; // Import dark mode context
+import React, { useState } from 'react';
+import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { MapPin, Hotel, Phone, CheckCircle, Search } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { hotels } from '@/data/hotel-data';
 
 const HomePage = () => {
-  const { darkMode, setDarkMode } = useDarkMode(); // Use global dark mode state
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
 
   const filteredHotels = hotels.filter(
     (hotel) => hotel.isValid && hotel.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Function to convert hotel name into a URL-friendly slug
+  const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
+
   return (
-    <div className={`container mx-auto p-6 transition-all duration-300 ${darkMode ? "bg-gray-900 text-white" : "bg-white text-black"}`}>
+    <div className="container mx-auto p-6 transition-all duration-300 bg-white text-black">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold">Available Hotels</h1>
-        <Button onClick={() => setDarkMode(!darkMode)} className="ml-4 flex items-center gap-2">
-          {darkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
-          {darkMode ? "Light Mode" : "Dark Mode"}
-        </Button>
       </div>
 
       <div className="relative mb-6">
@@ -107,7 +59,7 @@ const HomePage = () => {
               </CardContent>
 
               <CardFooter className="pt-2">
-                <Link to={`/hotel/${hotel.id}`} className="w-full">
+                <Link to={`/${toSlug(hotel.name)}`} className="w-full">
                   <Button className="w-full">View Details</Button>
                 </Link>
               </CardFooter>
@@ -122,14 +74,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-
-
-
-
-module.exports = {
-  darkMode: "class",
-  theme: {
-    extend: {},
-  },
-  plugins: [],
-};
