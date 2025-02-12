@@ -3,9 +3,10 @@ import { UserProvider } from "./Context/AuthContext";
 import DashboardLayout from "./components/DashboardLayOut";
 import HomePage from "./HomePage";
 import HotelDetails from "./HotelDetails";
-import RoomDetails from "./RoomDetails";
+import RoomDetails from "./RestaurantDetails";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import FoodMenu from "./FoodMenu";
 
 const AppContent = () => {
   const loc=useLocation()
@@ -23,6 +24,7 @@ const AppContent = () => {
         <Route path="/:hotelName/profile/*" element={<DashboardLayout />} />
         <Route path="/:hotelName" element={<HotelDetails />} />
         <Route path="/:hotelName/:roomNumber" element={<RoomDetails />} />
+        <Route path="/:hotelName/:roomNumber/:restaurantName/menu" element={<FoodMenu />} />
       </Routes>
       {mainLoc !== "profile" && <Footer />}
     </>

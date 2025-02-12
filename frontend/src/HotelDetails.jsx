@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { hotels } from "@/data/hotel-data";
 import { rooms } from "@/data/rooms-data";
 import { MapPin, Hotel, Phone, CheckCircle } from "lucide-react";
+import { Button } from "./components/ui/button";
 
 const HotelDetails = () => {
   const { hotelName } = useParams();
@@ -52,7 +53,7 @@ const HotelDetails = () => {
                   <p className="text-sm text-gray-600">Capacity: {room.capacity} persons</p>
                   <p className="text-sm text-gray-600">Price: ₹{room.price}</p>
                   <Link to={`/${hotelName}/${room.number}`}>
-                    <button className="mt-3 w-full bg-blue-600 text-white py-2 rounded-md">View Room</button>
+                    <Button className="mt-4">View Details</Button>
                   </Link>
                 </div>
               ))
