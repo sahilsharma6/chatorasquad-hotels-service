@@ -17,7 +17,7 @@ const DashboardLayout = ({}) => {
  
   
   return (
-    <div className="flex min-h-screen bg-slate-950">
+    <div className="flex min-h-screen bg-">
       {/* Sidebar */}
       <div className={`${isOpen ? 'w-64' : 'w-20'} bg-slate-900 text-white transition-all duration-300 ease-in-out p-4 fixed h-full`}>
         <div className="flex items-center mb-8">
@@ -69,7 +69,7 @@ const DashboardLayout = ({}) => {
         </header>
 
         {/* Dashboard Content */}
-        <main className="p-6">
+        <main className="p-6 ">
          <Routes>
           <Route path='/' element={<Profile />} ></Route>
           <Route path='/room' element={<Room />} ></Route>
