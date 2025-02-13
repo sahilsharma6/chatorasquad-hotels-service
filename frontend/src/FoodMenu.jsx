@@ -1,17 +1,17 @@
-"use client"
-
 import { useState, useEffect, useRef } from "react"
-import { useParams } from "react-router-dom"
+import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import { rooms } from "@/data/rooms-data"
 import { hotels } from "@/data/hotel-data"
-import { ShoppingCart, Plus, Minus, Trash2, X, CookingPot, Search } from "lucide-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { ShoppingCart, Plus, Minus, Trash2, X, CookingPot, Search, ShieldAlert } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
 import CheckoutModal from "./CheckoutModal"
 import { menuCategories, menuItems } from "./data/menu-data"
 import { Input } from "@/components/ui/input"
+import Cookies from "js-cookie";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 // Constants
 const TAX_RATE = 0.18
@@ -19,6 +19,9 @@ const DELIVERY_FEE = 50
 
 const FoodMenu = () => {
     const { hotelName, roomNumber } = useParams()
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
     const [cart, setCart] = useState([])
     const [activeCategory, setActiveCategory] = useState(menuCategories[0].id)
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false)
@@ -34,6 +37,22 @@ const FoodMenu = () => {
 
     const sectionRefs = useRef({})
 
+    const [isVerified, setIsVerified] = useState(null);
+
+
+    useEffect(() => {
+        const storedToken = Cookies.get("hotel_auth_token");
+        const urlToken = searchParams.get("verify");
+
+        if (storedToken !== urlToken) {
+            setIsVerified(false);
+            Cookies.remove("hotel_auth_token");
+        } else {
+            setIsVerified(true);
+        }
+    }, [navigate, searchParams, hotelName]);
+
+
     // Cart persistence logic
     useEffect(() => {
         const savedCart = localStorage.getItem("foodCart")
@@ -48,29 +67,29 @@ const FoodMenu = () => {
     useEffect(() => {
         const handleScroll = () => {
             if (isScrolling) return
-    
+
             const scrollPosition = window.scrollY
             const headerOffset = 100 // Adjust this value based on your header height
-    
+
             let currentCategory = menuCategories[0].id
             let minDistance = Infinity
-    
+
             menuCategories.forEach((category) => {
                 const element = sectionRefs.current[category.id]
                 if (element) {
                     const rect = element.getBoundingClientRect()
                     const distance = Math.abs(rect.top - headerOffset)
-                    
+
                     if (distance < minDistance) {
                         minDistance = distance
                         currentCategory = category.id
                     }
                 }
             })
-    
+
             setActiveCategory(currentCategory)
         }
-    
+
         window.addEventListener("scroll", handleScroll)
         return () => window.removeEventListener("scroll", handleScroll)
     }, [isScrolling, menuCategories])
@@ -138,30 +157,70 @@ const FoodMenu = () => {
     const scrollToCategory = (categoryId) => {
         setIsScrolling(true)
         setActiveCategory(categoryId)
-    
+
         const element = sectionRefs.current[categoryId]
         if (element) {
             // Get the header height - adjust this value based on your actual header height
             const headerHeight = 100
-            
+
             // Get the position of the category section relative to the viewport
             const rect = element.getBoundingClientRect()
-            
+
             // Calculate the scroll position
             const scrollPosition = window.pageYOffset + rect.top - headerHeight
-            
+
             // Scroll to the position
             window.scrollTo({
                 top: scrollPosition,
                 behavior: 'smooth'
             })
-    
+
             // Reset scrolling state after animation
             setTimeout(() => {
                 setIsScrolling(false)
             }, 1000)
         }
     }
+
+    if (isVerified === null) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600">Checking authentication...</p>
+            </div>
+        );
+    }
+
+    if (!isVerified) {
+        return (
+          <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              transition={{ duration: 0.3 }}
+            >
+              <Card className="w-full max-w-md shadow-lg border border-red-200">
+                <CardHeader className="text-center">
+                  <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-2" />
+                  <CardTitle className="text-red-600 text-lg">Access Denied</CardTitle>
+                </CardHeader>
+                <CardContent className="text-center space-y-4">
+                  <Alert variant="destructive">
+                    <AlertDescription>
+                      You are not verified to access this page. Please enter the correct password to continue.
+                    </AlertDescription>
+                  </Alert>
+                  <Button 
+                    className="w-full bg-red-500 hover:bg-red-600"
+                    onClick={() => navigate(`/${hotelName}`)}
+                  >
+                    Go Back to Hotel Page
+                  </Button>
+                </CardContent>
+              </Card>
+            </motion.div>
+          </div>
+        );
+      }
 
     return (
         <div className="px-4 lg:px-20 py-10 min-h-screen">

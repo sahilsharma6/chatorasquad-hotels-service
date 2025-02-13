@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { restaurants } from '@/data/restaurant-data';
 import { Clock, Mail, MapPin, Phone } from 'lucide-react';
@@ -7,13 +7,16 @@ import { Button } from './components/ui/button';
 
 const RestaurantDetails = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const verifyToken = searchParams.get("verify"); // Get token from URL
   const { hotelName, roomNumber } = useParams();
+
 
   const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
 
   const handleViewMenu = (restaurantName) => {
     // Navigate to the restaurant's menu while maintaining the hotel and room context
-    navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurantName)}/menu`);
+    navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurantName)}/menu?verify=${verifyToken}`);
   };
 
   return (
