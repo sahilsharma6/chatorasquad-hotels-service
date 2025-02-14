@@ -12,7 +12,7 @@ export const UserProvider = ({ children }) => {
   const [tok,setTok]=useState(null)
   const location = useLocation();
   const navigate = useNavigate()
-  const { hotelName } = useParams(); 
+  const param = useParams(); 
   useEffect(() => {
     const fetchUserDetails = async () => {
       try {
@@ -24,9 +24,14 @@ export const UserProvider = ({ children }) => {
       setLoading(false); // Stop loading since there's no token
       return;
     }
-        const response = await apiClient.post("user/auth/verify-token", { token });
+    console.log(location.pathname.split('/')[1]);
+    
+        const response = await apiClient.post("user/auth/verify-token", { token,hotel:location.pathname.split('/')[1]});
         if (response.data) {
-          setUser(response.data.user);
+          console.log(response.data);
+          let hotelId=response.data.user.userId
+          hotelId.hotelId=response.data.user._id
+          setUser(hotelId);
           setTok(response.data.tok)
         } else {
           setUser(null);
