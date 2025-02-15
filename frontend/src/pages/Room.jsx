@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Plus, Search, ChevronUp, ChevronDown, Pencil, Trash2 } from 'lucide-react';
 import {
   Dialog,
@@ -12,8 +12,9 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import RoomTable from '../components/Hotel/RoomTable';
 import { DeleteModal, EditRoomModal } from '@/components/Hotel/EditDeleteModal';
+import apiClient from '@/services/ApiClient';
 
-const Room = () => {
+const Room = ({user}) => {
   const [rooms, setRooms] = useState([
     { id: 1, name: 'Conference Room A', date: '2025-02-12' },
     { id: 2, name: 'Meeting Room B', date: '2025-02-13' },
@@ -32,6 +33,23 @@ const Room = () => {
 
   const itemsPerPage = 5;
 
+  useEffect(()=>{
+    try {
+    async  function GetRooms(){
+        const res=await apiClient.get('/hotel/rooms/'+user.hotelId)
+        console.log(res.data);
+        if(!res.data)return
+        const getRoom=res.data.map((val)=>({
+          id:val._id, name : val.room,date:val.createdAt.split('T')[0]
+        }))
+        console.log(getRoom);
+        setRooms(getRoom)
+      }
+      GetRooms()
+    } catch (error) {
+      
+    }
+  },[user?.hotelId])
   // Format date function
   const formatDate = (date) => {
     return date.toISOString().split('T')[0];
@@ -55,6 +73,7 @@ const Room = () => {
     currentPage * itemsPerPage
   );
 
+
   const handleSort = (field) => {
     if (sortField === field) {
       setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
@@ -64,12 +83,20 @@ const Room = () => {
     }
   };
 
-  const handleAdd = () => {
-    const newId = Math.max(...rooms.map(room => room.id)) + 1;
-    const currentDate = formatDate(new Date());
+  console.log(user);
+  const handleAdd =async () => {
+    
+    const res=await apiClient.post('/hotel/add-room/'+user.hotelId,{room:newRoom.name})
+    if(!res.data){
+      return ;
+    }
+    console.log(res.data);
+    
+    // const newId = Math.max(...rooms.map(room => room.id)) + 1;
+    const currentDate = res.data.createdAt.split('T')[0];
     setRooms([...rooms, { 
       ...newRoom, 
-      id: newId,
+      id: res.data._id,
       date: currentDate
     }]);
     setNewRoom({ name: '' });
@@ -83,7 +110,11 @@ const Room = () => {
     setIsEditModalOpen(false);
   };
 
-  const handleDelete = () => {
+  const handleDelete = async() => {
+    const res=await apiClient.delete('/hotel/delete-room/'+selectedRoom.id)
+    if(!res.data) return 
+    console.log(res.data);
+    
     setRooms(rooms.filter(room => room.id !== selectedRoom.id));
     setIsDeleteModalOpen(false);
   };
@@ -100,7 +131,7 @@ const Room = () => {
 
   return (
     <div className="p-4 space-y-4">
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center flex-wrap gap-5">
         <div className="relative">
           <Search className="absolute left-2 top-3.5 h-4 w-4 text-gray-500" />
           <Input

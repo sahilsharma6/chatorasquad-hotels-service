@@ -11,7 +11,7 @@ export default function RoomTable({SortIcon,handleSort,setSelectedRoom,setIsDele
         <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="rounded-md border"
+        className="rounded-md border w-full"
       >
         <Table>
           <TableHeader>
