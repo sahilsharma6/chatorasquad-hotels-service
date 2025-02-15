@@ -1,15 +1,22 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { MapPin, Hotel, Phone, CheckCircle, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { hotels } from '@/data/hotel-data';
+// import { hotels } from '@/data/hotel-data';
+import { useHotel } from './Context/HotelContext';
 
 const HomePage = () => {
+  const { fetchValidatedHotels, hotels } = useHotel();
   const [search, setSearch] = useState('');
 
+  useEffect(() => {
+    fetchValidatedHotels();
+  }, []);
+
+
   const filteredHotels = hotels.filter(
-    (hotel) => hotel.isValid && hotel.name.toLowerCase().includes(search.toLowerCase())
+    (hotel) => hotel?.isValid && hotel?.name.toLowerCase().includes(search.toLowerCase())
   );
 
   // Function to convert hotel name into a URL-friendly slug
@@ -35,10 +42,10 @@ const HomePage = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredHotels.length > 0 ? (
           filteredHotels.map((hotel) => (
-            <Card key={hotel.id} className="hover:shadow-lg transition-shadow duration-300">
+            <Card key={hotel?._id} className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
                 <div className="flex flex-col">
-                  <h3 className="font-semibold text-lg">{hotel.name}</h3>
+                  <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                   <div className="flex items-center mt-1">
                     <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
                     <span className="text-sm text-gray-500">Verified Hotel</span>
@@ -46,20 +53,20 @@ const HomePage = () => {
                 </div>
                 <Hotel className="h-6 w-6 text-gray-600" />
               </CardHeader>
-              
+
               <CardContent>
                 <div className="flex items-center text-sm text-gray-500">
                   <Phone className="h-4 w-4 mr-2" />
-                  <span>{hotel.phoneNo}</span>
+                  <span>{hotel?.phoneNo}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-500 mt-2">
                   <MapPin className="h-4 w-4 mr-2" />
-                  <span>{hotel.location}</span>
+                  <span>{hotel?.location}</span>
                 </div>
               </CardContent>
 
               <CardFooter className="pt-2">
-                <Link to={`/${toSlug(hotel.name)}`} className="w-full">
+                <Link to={`/${toSlug(hotel?.name)}?hotelId=${hotel?._id}`} className="w-full">
                   <Button className="w-full">View Details</Button>
                 </Link>
               </CardFooter>
