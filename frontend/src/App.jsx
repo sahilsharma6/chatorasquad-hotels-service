@@ -26,9 +26,9 @@ const AppContent = () => {
         <Route path="/:hotelName/profile/*" element={<DashboardLayout />} />
         <Route path="/:hotelName" element={<HotelDetails />} />
         <Route path="/:hotelName/:roomNumber" element={
-          <ProtectedRoute>
+          // <ProtectedRoute>
             <RestaurantDetails />
-          </ProtectedRoute>
+          // </ProtectedRoute>
           } />
         <Route 
           path="/:hotelName/:roomNumber/:restaurantName/menu" 
