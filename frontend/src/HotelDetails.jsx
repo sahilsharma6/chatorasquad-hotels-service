@@ -50,9 +50,9 @@ const HotelDetails = () => {
     );
   }
 
-  if (!HotelDetails || HotelDetails?._id !== hotelId) {
-    return <div className="container mx-auto p-6 text-center text-red-500">Hotel not found.</div>;
-  }
+  // if (!HotelDetails || HotelDetails?._id !== hotelId) {
+  //   return <div className="container mx-auto p-6 text-center text-red-500">Hotel not found.</div>;
+  // }
 
   return (
     <div className="container mx-auto p-6">
