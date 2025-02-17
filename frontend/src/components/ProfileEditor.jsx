@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 // import { toast } from '@/components/ui/use-toast';
 import { Camera, Pencil, X } from 'lucide-react';
 import apiClient from '@/services/ApiClient';
+import PasswordComponent from './Hotel/PasswordComponent';
 
 const ProfileEditor = ({user}) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -17,7 +18,8 @@ const ProfileEditor = ({user}) => {
     email: user?.email,
     age: user?.age,
     phoneNo: user?.phoneNo,
-    gender: user?.gender
+    gender: user?.gender,
+    name:user?.name
   });
 
   console.log(user);
@@ -109,6 +111,18 @@ const ProfileEditor = ({user}) => {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+              <motion.div variants={itemVariants} className="space-y-2">
+                <Label htmlFor="name">Hotel Name</Label>
+                <Input
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  disabled={!isEditing}
+                  className="py-6"
+                  required
+                />
+              </motion.div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <motion.div variants={itemVariants} className="space-y-2">
                 <Label htmlFor="firstName">First Name</Label>
@@ -211,6 +225,7 @@ const ProfileEditor = ({user}) => {
             )}
           </form>
         </CardContent>
+            <PasswordComponent getPassword={user?.protected_password} id={user?.hotelId} />
       </Card>
     </motion.div>
   );
