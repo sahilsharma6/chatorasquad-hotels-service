@@ -8,6 +8,9 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FoodMenu from "./FoodMenu";
 import { ProtectedRoute } from "./Context/ProtectedRoute";
+import RestLayout from "./RestLayout";
+import MenuLayout from "./MenuLayout";
+import OrdersPage from "./OrdersPage";
 
 
 const AppContent = () => {
@@ -36,6 +39,9 @@ const AppContent = () => {
               <FoodMenu />
           } 
         />
+          <Route path="/rest" element={<RestLayout />} />
+          <Route path='/rest/menu' element={<MenuLayout />} />
+          <Route path="/orders" element={<OrdersPage />} />
       </Routes>
       {mainLoc !== "profile" && <Footer />}
     </>

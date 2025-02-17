@@ -8,6 +8,7 @@ export const RestaurantProvider = ({ children }) => {
     const [menu, setMenu] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [MenuItems, setMenuItems] = useState(null);
 
     // Fetch all valid restaurants
     const fetchRestaurant = async () => {
@@ -52,6 +53,25 @@ export const RestaurantProvider = ({ children }) => {
         }
     };
 
+    const fetchAdminMenu = async () => {
+        try {
+            setLoading(true);
+            const response = await apiClient.get(`/menu/getItemsWithCategory`);
+            setMenuItems(response.data);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const getLogoUrl = (logoPath) => {
+        if (!logoPath) return null;
+        // Assuming your API base URL is configured in your environment
+        return `${import.meta.env.IMAGE_URL}/${logoPath}`;
+      };
+
     return (
         <RestaurantContext.Provider value={{
             Restaurants,
@@ -60,7 +80,10 @@ export const RestaurantProvider = ({ children }) => {
             error,
             fetchRestaurant,
             fetchRestaurantMenu,
-            fetchRestaurantMenuById
+            fetchRestaurantMenuById,
+            MenuItems,
+            fetchAdminMenu,
+            getLogoUrl
         }}>
             {children}
         </RestaurantContext.Provider>
