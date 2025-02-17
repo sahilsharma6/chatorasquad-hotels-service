@@ -1,65 +1,102 @@
-import React from "react";
-import { useParams, Link } from "react-router-dom";
-import { hotels } from "@/data/hotel-data";
-import { rooms } from "@/data/rooms-data";
+import React, { useEffect } from "react";
+import { useParams, Link, useLocation } from "react-router-dom";
+import { useHotel } from "./Context/HotelContext";
 import { MapPin, Hotel, Phone, CheckCircle } from "lucide-react";
 import { Button } from "./components/ui/button";
+import { Skeleton } from "./components/ui/skeleton";
 
 const HotelDetails = () => {
+  const { fetchHotelById, fetchHotelRooms, HotelDetails, Rooms, loading } = useHotel();
   const { hotelName } = useParams();
-  const formattedName = hotelName.replace(/-/g, " ");
-  const hotel = hotels.find((h) => h.name.toLowerCase() === formattedName.toLowerCase());
+  const location = useLocation();
+  
+  const searchParams = new URLSearchParams(location.search);
+  const hotelId = searchParams.get("hotelId");
 
-  if (!hotel) {
-    return <div className="container mx-auto p-6 text-center text-red-500">Hotel not found.</div>;
+  useEffect(() => {
+    if (hotelId) {
+      fetchHotelById(hotelId);
+      fetchHotelRooms(hotelId);
+    }
+  }, [hotelId]);
+
+  // 🔹 Skeleton Loader while data is fetching
+  if (loading) {
+    return (
+      <div className="container mx-auto p-6">
+        <div className="bg-white shadow-lg rounded-lg p-6">
+          <Skeleton className="h-10 w-64 mb-4" />
+          <Skeleton className="h-5 w-40 mb-2" />
+          <Skeleton className="h-5 w-48 mb-2" />
+          <Skeleton className="h-24 w-full mb-4" />
+          <Skeleton className="h-8 w-40" />
+        </div>
+
+        <div className="mt-6">
+          <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {[...Array(3)].map((_, index) => (
+              <div key={index} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                <Skeleton className="h-40 w-full mb-3" />
+                <Skeleton className="h-6 w-48 mb-2" />
+                <Skeleton className="h-5 w-32 mb-1" />
+                <Skeleton className="h-5 w-28 mb-1" />
+                <Skeleton className="h-8 w-32 mt-3" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
   }
 
-  // Filter rooms for this hotel
-  const hotelRooms = rooms.filter((room) => room.hotelId === hotel.id);
+  if (!HotelDetails || HotelDetails?._id !== hotelId) {
+    return <div className="container mx-auto p-6 text-center text-red-500">Hotel not found.</div>;
+  }
 
   return (
     <div className="container mx-auto p-6">
       <div className="bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">{hotel.name}</h1>
+          <h1 className="text-3xl font-bold">{HotelDetails?.name || "Unnamed Hotel"}</h1>
           <Hotel className="h-8 w-8 text-gray-600" />
         </div>
 
         <div className="flex items-center text-lg text-gray-700">
           <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
-          <span>Verified Hotel</span>
+          <span>{HotelDetails?.isValid ? "Verified Hotel" : "Not Verified"}</span>
         </div>
 
         <div className="mt-4 text-gray-600">
           <p className="flex items-center">
-            <Phone className="h-5 w-5 mr-2" /> {hotel.phoneNo}
+            <Phone className="h-5 w-5 mr-2" /> {HotelDetails?.phoneNo || "Not Available"}
           </p>
           <p className="flex items-center mt-2">
-            <MapPin className="h-5 w-5 mr-2" /> {hotel.location}
+            <MapPin className="h-5 w-5 mr-2" /> {HotelDetails?.address || "No Address Provided"}
           </p>
         </div>
 
-        <p className="mt-4 text-gray-500">{hotel.description || "No description available."}</p>
+        <p className="mt-4 text-gray-500">{HotelDetails?.description || "No description available."}</p>
 
-        {/* Rooms Section */}
+        {/* 🏨 Rooms Section */}
         <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {hotelRooms.length > 0 ? (
-              hotelRooms.map((room) => (
-                <div key={room.id} className="bg-gray-100 p-4 rounded-lg shadow-md">
-                  <img src={room.image} alt={room.type} className="w-full h-40 object-cover rounded-md mb-3" />
-                  <h3 className="text-lg font-bold">{room.type} - Room {room.number}</h3>
-                  <p className="text-sm text-gray-600">Capacity: {room.capacity} persons</p>
-                  <p className="text-sm text-gray-600">Price: ₹{room.price}</p>
-                  <Link to={`/${hotelName}/${room.number}`}>
+            {Rooms?.length > 0 ? (
+              Rooms?.map((room) => (
+                <div key={room?._id} className="bg-gray-100 p-4 rounded-lg shadow-md">
+                  <img src={room?.image || '/no-image-food-placeholder.webp'} alt={room?.type} className="w-full h-40 object-cover rounded-md mb-3" />
+                  <h3 className="text-lg font-bold">{room?.type} - Room {room?.room}</h3>
+                  <p className="text-sm text-gray-600">Capacity: {room?.capacity} persons</p>
+                  <p className="text-sm text-gray-600">Price: ₹{room?.price}</p>
+                  <Link to={`/${hotelName}/room=${room?.room}`}>
                     <Button className="mt-4">View Details</Button>
                   </Link>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500">No rooms available.</p>
-            )}
+              <p className="text-gray-500">No Rooms available.</p>
+            )} 
           </div>
         </div>
       </div>
