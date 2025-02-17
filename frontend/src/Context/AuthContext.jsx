@@ -31,13 +31,17 @@ export const UserProvider = ({ children }) => {
           console.log(response.data);
           let hotelId=response.data.user.userId
           hotelId.hotelId=response.data.user._id
+          hotelId.name=response.data.user.name
+          hotelId.protected_password=response.data.user.protected_password
           setUser(hotelId);
           setTok(response.data.tok)
         } else {
           setUser(null);
+          window.location.href = "/";
         }
       } catch (error) {
         setUser(null);
+        window.location.href = "/";
       } finally {
         setLoading(false);
       }

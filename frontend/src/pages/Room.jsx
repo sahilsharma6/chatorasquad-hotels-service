@@ -36,7 +36,7 @@ const Room = ({user}) => {
   useEffect(()=>{
     try {
     async  function GetRooms(){
-        const res=await apiClient.get('/hotel/rooms/'+user.hotelId)
+        const res=await apiClient.get('/hotel/rooms/'+user.hotelId,)
         console.log(res.data);
         if(!res.data)return
         const getRoom=res.data.map((val)=>({
