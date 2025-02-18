@@ -5,6 +5,7 @@ import { Clock, Mail, MapPin, Phone } from 'lucide-react';
 import { Button } from './components/ui/button';
 import { useRestaurant } from './Context/ResturantContext';
 import { Skeleton } from "@/components/ui/skeleton"; // ShadCN Skeleton for loading state
+import RestLayout from './RestLayout';
 
 const RestaurantDetails = () => {
   const { fetchRestaurant, Restaurants, loading } = useRestaurant(); // Ensure 'loading' is from context
@@ -12,7 +13,7 @@ const RestaurantDetails = () => {
   const [searchParams] = useSearchParams();
   const verifyToken = searchParams.get("verify"); // Get token from URL
   const { hotelName, roomNumber } = useParams();
-  
+
 
   useEffect(() => {
     fetchRestaurant();
@@ -28,7 +29,9 @@ const RestaurantDetails = () => {
 
   return (
     <div className="container mx-auto py-8 px-4">
+      <RestLayout hotelName={hotelName} roomNumber={roomNumber} toSlug={toSlug} verifyToken={verifyToken}/>
       <h1 className="text-3xl font-bold mb-8">Featured Restaurants</h1>
+
 
       {/* Show Skeleton Loader while data is loading */}
       {loading ? (
@@ -84,22 +87,10 @@ const RestaurantDetails = () => {
                       <Clock className="w-4 h-4" />
                       <span>{restaurant?.openingHours?.monday || "Opening hours not available"}</span>
                     </div>
-                    <div>
-                      <span className="font-semibold">Cuisine: </span>
-                      {restaurant?.cuisine || "Unknown"}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Price Range: </span>
-                      {restaurant?.priceRange || "N/A"}
-                    </div>
-                    <div>
-                      <span className="font-semibold">Rating: </span>
-                      {restaurant?.rating ? `${restaurant?.rating} / 5` : "Not rated"}
-                    </div>
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={() =>  navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
+                  <Button onClick={() => navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
                     View Menu
                   </Button>
                 </CardFooter>
