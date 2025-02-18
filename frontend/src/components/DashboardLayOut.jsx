@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Bell, Home, Building2, Menu, X } from 'lucide-react';
+import { Bell, Home, Building2, Menu, X, Hotel } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -10,6 +10,7 @@ import Profile from '@/pages/Profile';
 import Room from '@/pages/Room';
 import Kittchen from '@/pages/Kitchen';
 import { FaBowlFood } from 'react-icons/fa6';
+import HotelOrders from '@/pages/HotelOrders';
 
 const DashboardLayout = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -112,6 +113,12 @@ const DashboardLayout = () => {
             path={'/' + hotelName + '/profile/room/?token=' + tok} 
             pathname={'/' + hotelName + '/profile/room'} 
           />
+          <NavItem icon={< Hotel size={20} />}
+          label={'Orders'}
+          isOpen={isOpen}
+          path={'/' + hotelName + '/profile/orders/?token=' + tok} 
+          pathname={'/' + hotelName + '/profile/orders'} 
+          />
         </nav>
       </div>
       
@@ -149,6 +156,7 @@ const DashboardLayout = () => {
           <Routes>
             <Route path='/' element={<Profile />} />
             <Route path='/room' element={<Room user={user} />} />
+            <Route path='/orders' element={<HotelOrders />} />
             {/* <Route path='/kitchen' element={<Kittchen />} /> */}
           </Routes>
         </main>

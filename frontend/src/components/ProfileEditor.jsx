@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Camera, Pencil, X } from 'lucide-react';
 import apiClient from '@/services/ApiClient';
 import PasswordComponent from './Hotel/PasswordComponent';
+import { useLocation, useParams } from 'react-router-dom';
 
 const ProfileEditor = ({user}) => {
   const [isEditing, setIsEditing] = useState(false);
@@ -23,6 +24,13 @@ const ProfileEditor = ({user}) => {
   });
 
   console.log(user);
+  const {hotelName}=useParams()
+  console.log(hotelName);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const token = queryParams.get('token');
+  // Now you can use the token as needed
+  console.log(token);
   
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -40,6 +48,7 @@ const ProfileEditor = ({user}) => {
         const res=await apiClient.put('/hotel/update/'+user?.hotelId,formData)
         if(!res.data) return
         console.log(res.data);
+        window.location.href=`/${res.data.name}/profile?token=${token}`
          setIsEditing(false);
     } catch (error) {
         
