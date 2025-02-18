@@ -13,12 +13,18 @@ const HotelDetails = () => {
   const searchParams = new URLSearchParams(location.search);
   const hotelId = searchParams.get("hotelId");
 
+  console.log(hotelId);
+  
+
   useEffect(() => {
     if (hotelId) {
       fetchHotelById(hotelId);
       fetchHotelRooms(hotelId);
     }
-  }, [hotelId]);
+  }, [location]);
+
+  console.log(HotelDetails);
+  
 
   // 🔹 Skeleton Loader while data is fetching
   if (loading) {

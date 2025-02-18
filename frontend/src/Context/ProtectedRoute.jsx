@@ -6,6 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { hotels } from '@/data/hotel-data';
 import Cookies from 'js-cookie';
+import { useHotel } from './HotelContext';
+import { useToast } from '@/hooks/use-toast';
 
 // Generate a secure token
 const generateToken = (hotelId, timestamp) => {
@@ -13,12 +15,33 @@ const generateToken = (hotelId, timestamp) => {
 };
 
 export const ProtectedRoute = ({ children }) => {
+  const {VerifyPassword, fetchHotelByName,
+    HotelDetailsByName } = useHotel();
+
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isVerified, setIsVerified] = useState(false);
   const { hotelName, roomNumber } = useParams();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
+  const { toast } = useToast();
+
+  const hotel_name = decodeURIComponent(hotelName);
+
+  
+  const hotelId = HotelDetailsByName?._id;
+  // console.log(hotelId, password);
+  
+    useEffect(() => {
+      fetchHotelByName(hotel_name);
+    }, [hotel_name]);
+
+  
+
+  // useEffect(() => {
+  //   VerifyPassword(hotelId, password);
+  // }, [])
+  
 
   // Convert URL format to proper hotel name
   const formatHotelName = (urlName) => {
@@ -31,21 +54,19 @@ export const ProtectedRoute = ({ children }) => {
   // Find the hotel in the array
   const hotel = hotels.find(h => h.name === formatHotelName(hotelName));
 
-  const verifyPassword = () => {
-    if ('aa' === password) {
-      const timestamp = Date.now();
-      const token = generateToken(hotel.id, timestamp);
-  
-      // Store in Cookies with a short expiry (10 mins)
-      Cookies.set('hotel_auth_token', token, { expires: 1 / 144 }); // 1/144 = 10 minutes
-  
-      setIsVerified(true);
-      setError('');
-      
-      // Add verification to URL
-      setSearchParams({ verify: token });
-    } else {
-      setError('Incorrect password. Please contact hotel staff.');
+  const verifyPassword = async () => {
+    try {
+      const response = await VerifyPassword(hotelId, password);
+      if (response) {
+        setIsVerified(true);
+        console.log(response)
+      }
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: error.message,
+      })
     }
   };
 

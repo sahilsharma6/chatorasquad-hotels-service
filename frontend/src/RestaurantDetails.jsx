@@ -99,7 +99,7 @@ const RestaurantDetails = () => {
                   </div>
                 </CardContent>
                 <CardFooter>
-                  <Button onClick={() =>  navigate(`/${hotelName}/room=${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
+                  <Button onClick={() =>  navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
                     View Menu
                   </Button>
                 </CardFooter>
