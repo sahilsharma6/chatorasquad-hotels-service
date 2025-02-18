@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 import { UserProvider } from "./Context/AuthContext";
 import DashboardLayout from "./components/DashboardLayOut";
 import HomePage from "./HomePage";
@@ -8,19 +9,37 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import FoodMenu from "./FoodMenu";
 import { ProtectedRoute } from "./Context/ProtectedRoute";
-import RestLayout from "./RestLayout";
 import MenuLayout from "./MenuLayout";
 import OrdersPage from "./OrdersPage";
 
+// Custom hook to restore scroll position and handle navigation
+const useScrollToTop = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    window.scrollTo(0, 0); // Scroll to top on route change
+
+    // Handle back button press
+    const handlePopState = (event) => {
+      const previousPath = sessionStorage.getItem('previousPath');
+      if (previousPath && location.pathname.includes('/menu')) {
+        event.preventDefault();
+        navigate(previousPath);
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, [location.pathname, navigate]);
+};
 
 const AppContent = () => {
-  const loc=useLocation()
-  // console.log(loc.pathname.split('/'));
-  const getLoc=loc.pathname.split('/')
-  const mainLoc=getLoc[2]
-  console.log(mainLoc);
-  
-  
+  const loc = useLocation();
+  const mainLoc = loc.pathname.split('/')[2];
+
+  useScrollToTop(); // Call the scroll restoration hook
+
   return (
     <>
       {mainLoc !== "profile" && <Navbar />}
@@ -31,22 +50,20 @@ const AppContent = () => {
         <Route path="/:hotelName/:roomNumber" element={
           <ProtectedRoute>
             <RestaurantDetails />
-           </ProtectedRoute>
-          } />
+          </ProtectedRoute>
+        } />
         <Route 
           path="/:hotelName/:roomNumber/:restaurantName/menu" 
-          element={
-              <FoodMenu />
-          } 
+          element={<FoodMenu />} 
         />
-          <Route path="/rest" element={<RestLayout />} />
-          <Route path='/rest/menu' element={<MenuLayout />} />
-          <Route path="/orders" element={<OrdersPage />} />
+        <Route path='/:hotelName/:roomNumber/chatora-squad/menu' element={<MenuLayout />} />
+        <Route path="/orders" element={<OrdersPage />} />
       </Routes>
       {mainLoc !== "profile" && <Footer />}
     </>
   );
 };
+
 const App = () => {
   return (
     <Router>

@@ -1,14 +1,16 @@
 import { useState, useEffect, useRef } from "react"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
-import { ShoppingCart, Plus, Minus, Trash2, X, Search } from "lucide-react"
+import { ShoppingCart, Plus, Minus, Trash2, X, Search, ShieldAlert, ArrowLeft } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Input } from "@/components/ui/input"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useRestaurant } from "./Context/ResturantContext"
 import CheckoutModal from "./CheckoutModal"
+import Cookies from "js-cookie"
+import { Alert, AlertDescription } from "./components/ui/alert"
 
 // Constants
 const TAX_RATE = 0.18
@@ -33,18 +35,24 @@ const FoodMenu = () => {
     const [isScrolling, setIsScrolling] = useState(false)
     const sectionRefs = useRef({})
 
-    //   const [isVerified, setIsVerified] = useState(null);
-    //   useEffect(() => {
-    //     const storedToken = Cookies.get("hotel_auth_token");
-    //     const urlToken = searchParams.get("verify");
+    const [isVerified, setIsVerified] = useState(null);
 
-    //     if (storedToken !== urlToken) {
-    //         setIsVerified(false);
-    //         Cookies.remove("hotel_auth_token");
-    //     } else {
-    //         setIsVerified(true);
-    //     }
-    // }, [navigate, searchParams, hotelName]);
+
+    const handleBack = () => {
+        navigate(-1)
+      }
+
+    useEffect(() => {
+        const storedToken = Cookies.get("hotel_auth_token");
+        const urlToken = searchParams.get("verify");
+
+        if (storedToken !== urlToken) {
+            setIsVerified(false);
+          
+        } else {
+            setIsVerified(true);
+        }
+    }, [navigate, searchParams, hotelName]);
 
     useEffect(() => {
         const restaurantId = searchParams.get("restaurantid")
@@ -163,48 +171,57 @@ const FoodMenu = () => {
         }
     }
 
-    //   if (isVerified === null) {
-    //     return (
-    //         <div className="min-h-screen flex items-center justify-center bg-gray-50">
-    //             <p className="text-gray-600">Checking authentication...</p>
-    //         </div>
-    //     );
-    // }
+    if (isVerified === null) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600">Checking authentication...</p>
+            </div>
+        );
+    }
 
-    // if (!isVerified) {
-    //     return (
-    //       <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-    //         <motion.div 
-    //           initial={{ opacity: 0, scale: 0.9 }} 
-    //           animate={{ opacity: 1, scale: 1 }} 
-    //           transition={{ duration: 0.3 }}
-    //         >
-    //           <Card className="w-full max-w-md shadow-lg border border-red-200">
-    //             <CardHeader className="text-center">
-    //               <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-2" />
-    //               <CardTitle className="text-red-600 text-lg">Access Denied</CardTitle>
-    //             </CardHeader>
-    //             <CardContent className="text-center space-y-4">
-    //               <Alert variant="destructive">
-    //                 <AlertDescription>
-    //                   You are not verified to access this page. Please enter the correct password to continue.
-    //                 </AlertDescription>
-    //               </Alert>
-    //               <Button 
-    //                 className="w-full bg-red-500 hover:bg-red-600"
-    //                 onClick={() => navigate(`/${hotelName}`)}
-    //               >
-    //                 Go Back to Hotel Page
-    //               </Button>
-    //             </CardContent>
-    //           </Card>
-    //         </motion.div>
-    //       </div>
-    //     );
-    //   }
+    if (!isVerified) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
+                <motion.div
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.3 }}
+                >
+                    <Card className="w-full max-w-md shadow-lg border border-red-200">
+                        <CardHeader className="text-center">
+                            <ShieldAlert className="w-12 h-12 text-red-500 mx-auto mb-2" />
+                            <CardTitle className="text-red-600 text-lg">Access Denied</CardTitle>
+                        </CardHeader>
+                        <CardContent className="text-center space-y-4">
+                            <Alert variant="destructive">
+                                <AlertDescription>
+                                    You are not verified to access this page. Please enter the correct password to continue.
+                                </AlertDescription>
+                            </Alert>
+                            <Button
+                                className="w-full bg-red-500 hover:bg-red-600"
+                                onClick={() => navigate(`/${hotelName}`)}
+                            >
+                                Go Back to Hotel Page
+                            </Button>
+                        </CardContent>
+                    </Card>
+                </motion.div>
+            </div>
+        );
+    }
 
     return (
         <div className="container mx-auto">
+
+<Button
+        onClick={handleBack}
+        variant="ghost"
+        className="flex items-center gap-2 mt-4 mb-2 lg:mt-6"
+      >
+        <ArrowLeft className="h-4 w-4" />
+        Back
+      </Button>
             <div className="text-3xl font-bold text-center lg:my-6 hidden lg:block">Browse Menu</div>
             <div className="px-4 lg:px-20 min-h-screen ">
 

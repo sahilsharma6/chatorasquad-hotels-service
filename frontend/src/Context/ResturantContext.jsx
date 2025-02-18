@@ -57,7 +57,8 @@ export const RestaurantProvider = ({ children }) => {
         try {
             setLoading(true);
             const response = await apiClient.get(`/menu/getItemsWithCategory`);
-            setMenuItems(response.data);
+            const formattedMenuItems = Array.isArray(response.data) ? response.data : [response.data];
+            setMenuItems(formattedMenuItems);
             setError(null);
         } catch (err) {
             setError(err.message);
