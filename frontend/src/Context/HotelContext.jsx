@@ -7,15 +7,18 @@ const HotelContext = createContext();
 export const HotelProvider = ({ children }) => {
   const [hotels, setHotels] = useState([]);
   const [HotelDetails, setHotelDetails] = useState([]);
+  const [HotelDetailsByName, setHotelDetailsByName] = useState([]);
   const [Rooms, setRooms] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+
+  const [isPasswordVerified, setIsPasswordVerified] = useState(false);
 
   // Fetch all validated hotels
   const fetchValidatedHotels = async () => {
     try {
       setLoading(true);
-      const response = await apiClient.get('/hotel/valid-hotels');
+      const response = await apiClient.get('/hotel/all-hotels');
       setHotels(response.data);
       setError(null);
     } catch (err) {
@@ -30,7 +33,30 @@ export const HotelProvider = ({ children }) => {
     try {
       setLoading(true);
       const response = await apiClient.get(`/hotel/${hotelId}`);
+      console.log(response.data);
+      
+      // const formattedHotels = Array.isArray(response.data) ? response.data : [response.data];
       setHotelDetails(response.data);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchHotelByName = async (hotelName) => {
+    console.log(hotelName);
+    
+    try {
+      setLoading(true);
+      const response = await apiClient.get(`/hotel/hotelName/${hotelName}`);
+      console.log(response.data);
+      
+      // const formattedHotels = Array.isArray(response.data) ? response.data : [response.data];
+      setHotelDetailsByName(response.data);
       setError(null);
       return response.data;
     } catch (err) {
@@ -62,9 +88,23 @@ export const HotelProvider = ({ children }) => {
     setError(null);
   };
 
-  useEffect(() => {
-    fetchValidatedHotels();
-  }, []); // Fetch hotels when component mounts
+
+  const VerifyPassword = async (hotelId, password) => {
+    try {
+      setLoading(true);
+      const response = await apiClient.post(`/hotel/checkpassword/${hotelId}`, { password });
+      console.log(response.data);
+      
+      setIsPasswordVerified(response.data);
+      setError(null);
+      return response.data;
+    } catch (err) {
+      setError(err.message);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const value = {
     hotels,
@@ -75,7 +115,10 @@ export const HotelProvider = ({ children }) => {
     fetchHotelRooms,
     clearError,
     HotelDetails,
-    Rooms
+    Rooms,
+    VerifyPassword,
+    fetchHotelByName,
+    HotelDetailsByName
   };
 
   return (
