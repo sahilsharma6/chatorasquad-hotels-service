@@ -1,25 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardHeader, CardContent, CardFooter } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { MapPin, Hotel, Phone, CheckCircle, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
-// import { hotels } from '@/data/hotel-data';
 import { useHotel } from './Context/HotelContext';
 
 const HomePage = () => {
-  const { fetchValidatedHotels, hotels } = useHotel();
+  const { fetchValidatedHotels, hotels, loading } = useHotel();
   const [search, setSearch] = useState('');
 
   useEffect(() => {
     fetchValidatedHotels();
   }, []);
 
-
   const filteredHotels = hotels.filter(
     (hotel) => hotel?.isValid && hotel?.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Function to convert hotel name into a URL-friendly slug
   const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
 
   return (
@@ -40,7 +38,23 @@ const HomePage = () => {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredHotels.length > 0 ? (
+        {loading ? (
+          Array.from({ length: 6 }).map((_, index) => (
+            <Card key={index} className="hover:shadow-lg transition-shadow duration-300">
+              <CardHeader className="flex flex-row items-center justify-between pb-2">
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-6 w-6" />
+              </CardHeader>
+              <CardContent>
+                <Skeleton className="h-4 w-full mb-2" />
+                <Skeleton className="h-4 w-1/2" />
+              </CardContent>
+              <CardFooter>
+                <Skeleton className="h-10 w-full" />
+              </CardFooter>
+            </Card>
+          ))
+        ) : filteredHotels.length > 0 ? (
           filteredHotels.map((hotel) => (
             <Card key={hotel?._id} className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">

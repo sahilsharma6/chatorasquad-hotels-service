@@ -4,48 +4,89 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Check, Download, ArrowRight, X } from "lucide-react"
+import { Check, Download, ArrowRight } from "lucide-react"
+import { useNavigate, useParams } from "react-router-dom"
 import downloadInvoice from "./downloadInvoice"
+import { useOrder } from "./Context/OrderContext"
 
 const CheckoutModal = ({
   isOpen,
   onClose,
-  total,
+  orderData,
   customerInfo,
   setCustomerInfo,
-  onCompleteOrder,
+  onSuccess,
   isOrderComplete,
   orderDetails,
+  setOrderDetails,
 }) => {
   const [isDragging, setIsDragging] = useState(false)
+  const [orderPlaced, setOrderPlaced] = useState(false)
   const sliderRef = useRef(null)
   const sliderControls = useAnimation()
+  const { CreateOrder } = useOrder()
+  const navigate = useNavigate()
+  const { hotelName, roomName } = useParams()
 
+  const handleCreateOrder = async () => {
+    if (orderPlaced) return 
+  
+    setOrderPlaced(true)
+    try {
+      const finalOrderData = {
+        hotelId: orderData.hotelId,
+        roomId: orderData.roomId,
+        cart: orderData.cart,
+        name: customerInfo.name,
+        phoneNo: customerInfo.phone,
+      }
+  
+      const response = await CreateOrder(finalOrderData)
+      setOrderDetails(response)
+      onSuccess()
+      
+      // Wait a brief moment to show the success message
+      setTimeout(() => {
+        onClose()
+        // Navigate to the orders page using the current URL parameters
+        navigate(`/${hotelName}/${roomName}/orders`)
+      }, 2000)
+    } catch (error) {
+      console.error("Error creating order:", error)
+      setOrderPlaced(false)
+    }
+  }
+  
   const handleDrag = (event, info) => {
+    if (orderPlaced) return 
+  
     setIsDragging(true)
     const sliderWidth = sliderRef.current?.offsetWidth || 0
     const dragPercentage = (info.point.x / sliderWidth) * 100
-
+  
     if (dragPercentage >= 90) {
       sliderControls.start({ x: sliderWidth - 56 })
       setIsDragging(false)
-      setTimeout(onCompleteOrder, 300)
+      setTimeout(handleCreateOrder, 300)
     }
   }
-
+  
   const handleDragEnd = (event, info) => {
+    if (orderPlaced) return
+  
     setIsDragging(false)
     const sliderWidth = sliderRef.current?.offsetWidth || 0
     const dragPercentage = (info.point.x / sliderWidth) * 100
-
+  
     if (dragPercentage < 90) {
       sliderControls.start({ x: 0 })
     }
   }
-
+  
   useEffect(() => {
     if (!isOpen) {
       sliderControls.start({ x: 0 })
+      setOrderPlaced(false)
     }
   }, [isOpen, sliderControls])
 
@@ -108,7 +149,7 @@ const CheckoutModal = ({
                   </div>
 
                   <div className="space-y-2">
-                    <Label className="block font-medium">Total Amount: ₹{total.toFixed(2)}</Label>
+                    <Label className="block font-medium">Total Amount: ₹{orderData.totalAmount.toFixed(2)}</Label>
                     <div ref={sliderRef} className="relative h-16 bg-gray-100 rounded-full overflow-hidden shadow-inner">
                       <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-orange-500 opacity-50" />
                       <motion.div

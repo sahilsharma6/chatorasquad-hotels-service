@@ -47,17 +47,18 @@ const AppContent = () => {
         <Route path="/" element={<HomePage />} />
         <Route path="/:hotelName/profile/*" element={<DashboardLayout />} />
         <Route path="/:hotelName" element={<HotelDetails />} />
-        <Route path="/:hotelName/:roomNumber" element={
+        <Route path="/:hotelName/:roomName" element={
           <ProtectedRoute>
             <RestaurantDetails />
           </ProtectedRoute>
         } />
+        <Route path="/:hotelName/:roomName/orders" element={<OrdersPage />} />
         <Route 
-          path="/:hotelName/:roomNumber/:restaurantName/menu" 
-          element={<FoodMenu />} 
+          path="/:hotelName/:roomName/:restaurantName/menu" 
+          element={<FoodMenu isblock={true}/>} 
         />
-        <Route path='/:hotelName/:roomNumber/chatora-squad/menu' element={<MenuLayout />} />
-        <Route path="/orders" element={<OrdersPage />} />
+        <Route path='/:hotelName/:roomName/chatora-squad/menu' element={<MenuLayout isblock={false}/>} />
+        {/* <Route path="/orders" element={<OrdersPage />} /> */}
       </Routes>
       {mainLoc !== "profile" && <Footer />}
     </>

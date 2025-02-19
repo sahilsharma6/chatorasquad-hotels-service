@@ -49,7 +49,7 @@ const RestaurantCard = ({ restaurant, onViewMenu }) => {
                 {onViewMenu ? (
                     <Button onClick={onViewMenu}>View Menu</Button>
                 ) : (
-                    <Button onClick={() => navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
+                    <Button onClick={() => navigate(`/${hotelName}/${roomName}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)}>
                         View Menu
                     </Button>
                 )}

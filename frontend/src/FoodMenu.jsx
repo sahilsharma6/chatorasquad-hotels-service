@@ -16,9 +16,9 @@ import { Alert, AlertDescription } from "./components/ui/alert"
 const TAX_RATE = 0.18
 const DELIVERY_FEE = 50
 
-const FoodMenu = () => {
+const FoodMenu = ({isblock}) => {
     const { fetchRestaurantMenuById, menu, loading } = useRestaurant()
-    const { hotelName, roomNumber } = useParams()
+    const { hotelName, roomName } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams()
 
@@ -169,6 +169,14 @@ const FoodMenu = () => {
                 setIsScrolling(false)
             }, 1000)
         }
+    }
+
+    if (isblock) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600">This menu is under maintenance.</p>
+            </div>
+        );
     }
 
     if (isVerified === null) {

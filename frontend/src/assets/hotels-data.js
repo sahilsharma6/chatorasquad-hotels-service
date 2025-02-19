@@ -6,7 +6,7 @@ export const hotelsData = [
       userId: new mongoose.Types.ObjectId(),
       rooms: [
         {
-          roomNumber: "101",
+          roomName: "101",
           roomType: "Single",
           price: 100,
           menu: [
@@ -16,7 +16,7 @@ export const hotelsData = [
           ]
         },
         {
-          roomNumber: "102",
+          roomName: "102",
           roomType: "Double",
           price: 150,
           menu: [
@@ -34,7 +34,7 @@ export const hotelsData = [
       userId: new mongoose.Types.ObjectId(),
       rooms: [
         {
-          roomNumber: "201",
+          roomName: "201",
           roomType: "Suite",
           price: 250,
           menu: [
@@ -44,7 +44,7 @@ export const hotelsData = [
           ]
         },
         {
-          roomNumber: "202",
+          roomName: "202",
           roomType: "Penthouse",
           price: 500,
           menu: [
@@ -62,7 +62,7 @@ export const hotelsData = [
       userId: new mongoose.Types.ObjectId(),
       rooms: [
         {
-          roomNumber: "301",
+          roomName: "301",
           roomType: "Single",
           price: 120,
           menu: [
@@ -72,7 +72,7 @@ export const hotelsData = [
           ]
         },
         {
-          roomNumber: "302",
+          roomName: "302",
           roomType: "Double",
           price: 180,
           menu: [
@@ -90,7 +90,7 @@ export const hotelsData = [
       userId: new mongoose.Types.ObjectId(),
       rooms: [
         {
-          roomNumber: "401",
+          roomName: "401",
           roomType: "Suite",
           price: 350,
           menu: [
@@ -100,7 +100,7 @@ export const hotelsData = [
           ]
         },
         {
-          roomNumber: "402",
+          roomName: "402",
           roomType: "Penthouse",
           price: 700,
           menu: [
@@ -118,7 +118,7 @@ export const hotelsData = [
       userId: new mongoose.Types.ObjectId(),
       rooms: [
         {
-          roomNumber: "501",
+          roomName: "501",
           roomType: "Single",
           price: 80,
           menu: [
@@ -128,7 +128,7 @@ export const hotelsData = [
           ]
         },
         {
-          roomNumber: "502",
+          roomName: "502",
           roomType: "Double",
           price: 130,
           menu: [
