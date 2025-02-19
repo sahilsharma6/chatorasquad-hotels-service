@@ -12,10 +12,7 @@ const HotelDetails = () => {
   
   const searchParams = new URLSearchParams(location.search);
   const hotelId = searchParams.get("hotelId");
-
-  console.log(hotelId);
   
-
   useEffect(() => {
     if (hotelId) {
       fetchHotelById(hotelId);
@@ -23,10 +20,6 @@ const HotelDetails = () => {
     }
   }, [location]);
 
-  console.log(HotelDetails);
-  
-
-  // 🔹 Skeleton Loader while data is fetching
   if (loading) {
     return (
       <div className="container mx-auto p-6">
@@ -56,15 +49,11 @@ const HotelDetails = () => {
     );
   }
 
-  // if (!HotelDetails || HotelDetails?._id !== hotelId) {
-  //   return <div className="container mx-auto p-6 text-center text-red-500">Hotel not found.</div>;
-  // }
-
   return (
     <div className="container mx-auto p-6">
       <div className="bg-white shadow-lg rounded-lg p-6">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-3xl font-bold">{HotelDetails?.name || "Unnamed Hotel"}</h1>
+          <h1 className="text-3xl font-bold capitalize">{HotelDetails?.name || "Unnamed Hotel"}</h1>
           <Hotel className="h-8 w-8 text-gray-600" />
         </div>
 
@@ -84,7 +73,6 @@ const HotelDetails = () => {
 
         <p className="mt-4 text-gray-500">{HotelDetails?.description || "No description available."}</p>
 
-        {/* 🏨 Rooms Section */}
         <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,7 +83,7 @@ const HotelDetails = () => {
                   <h3 className="text-lg font-bold">{room?.type} - Room {room?.room}</h3>
                   <p className="text-sm text-gray-600">Capacity: {room?.capacity} persons</p>
                   <p className="text-sm text-gray-600">Price: ₹{room?.price}</p>
-                  <Link to={`/${hotelName}/room=${room?.room}`}>
+                  <Link to={`/${hotelName}/${room?.room}`}>
                     <Button className="mt-4">View Details</Button>
                   </Link>
                 </div>

@@ -9,13 +9,13 @@ export const hotels = [
     room: [
       {
         roomId: "r1",
-        roomNumber: "101",
+        roomName: "101",
         type: "Deluxe",
         price: 5000
       },
       {
         roomId: "r2",
-        roomNumber: "102",
+        roomName: "102",
         type: "Suite",
         price: 8000
       }
@@ -33,13 +33,13 @@ export const hotels = [
     room: [
       {
         roomId: "r3",
-        roomNumber: "201",
+        roomName: "201",
         type: "Standard",
         price: 3000
       },
       {
         roomId: "r4",
-        roomNumber: "202",
+        roomName: "202",
         type: "Deluxe",
         price: 5000
       }
@@ -57,13 +57,13 @@ export const hotels = [
     room: [
       {
         roomId: "r5",
-        roomNumber: "301",
+        roomName: "301",
         type: "Suite",
         price: 10000
       },
       {
         roomId: "r6",
-        roomNumber: "302",
+        roomName: "302",
         type: "Presidential Suite",
         price: 15000
       }
@@ -81,7 +81,7 @@ export const hotels = [
     room: [
       {
         roomId: "r7",
-        roomNumber: "401",
+        roomName: "401",
         type: "Standard",
         price: 2500
       }
@@ -99,13 +99,13 @@ export const hotels = [
     room: [
       {
         roomId: "r8",
-        roomNumber: "501",
+        roomName: "501",
         type: "Luxury Suite",
         price: 12000
       },
       {
         roomId: "r9",
-        roomNumber: "502",
+        roomName: "502",
         type: "Ocean View Suite",
         price: 14000
       }

@@ -11,17 +11,21 @@ import CheckoutModal from "./CheckoutModal"
 import { useNavigate, useParams, useSearchParams } from "react-router-dom"
 import Cookies from "js-cookie";
 import { Alert, AlertDescription } from "./components/ui/alert"
+import { useHotel } from "./Context/HotelContext"
+import { MenuItemSkeleton } from "./components/SketonLoadingForMenu/MenuItemSkeleton"
+import { CategorySkeleton } from "./components/SketonLoadingForMenu/CategorySkeleton"
 
 
 // Constants
 const TAX_RATE = 0.18
 const DELIVERY_FEE = 50
 
-const MenuLayout = () => {
+const MenuLayout = ({isblock}) => {
     const { MenuItems, fetchAdminMenu, getLogoUrl } = useRestaurant()
-    const { hotelName, roomNumber } = useParams()
+    const { hotelName, roomName } = useParams()
     const navigate = useNavigate()
-    const [searchParams] = useSearchParams()
+    const [searchParams] = useSearchParams();
+    const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms } = useHotel();
 
     const [cart, setCart] = useState([])
     const [activeCategory, setActiveCategory] = useState("")
@@ -34,8 +38,23 @@ const MenuLayout = () => {
     const [filteredItems, setFilteredItems] = useState([])
     const [isScrolling, setIsScrolling] = useState(false)
     const sectionRefs = useRef({})
-
     const [isVerified, setIsVerified] = useState(null);
+
+    useEffect(() => {
+        fetchHotelByName(hotelName);
+    }, []);
+
+    useEffect(() => {
+        if (HotelDetailsByName?._id) {
+            fetchHotelRooms(HotelDetailsByName._id);
+        }
+    }, [HotelDetailsByName?._id]);
+
+    const currentRoom = Rooms.find((room) => room.room === roomName);
+    
+    const hotelId = HotelDetailsByName?._id;
+    const RoomId = currentRoom?._id;
+    
 
     useEffect(() => {
         console.log("Fetching menu...");
@@ -46,16 +65,16 @@ const MenuLayout = () => {
         navigate(-1)
     }
 
-     useEffect(() => {
-            const storedToken = Cookies.get("hotel_auth_token");
-            const urlToken = searchParams.get("verify");
-    
-            if (storedToken !== urlToken) {
-                setIsVerified(false);
-            } else {
-                setIsVerified(true);
-            }
-        }, [navigate, searchParams, hotelName]);
+    useEffect(() => {
+        const storedToken = Cookies.get("hotel_auth_token");
+        const urlToken = searchParams.get("verify");
+
+        if (storedToken !== urlToken) {
+            setIsVerified(false);
+        } else {
+            setIsVerified(true);
+        }
+    }, [navigate, searchParams, hotelName]);
 
 
     useEffect(() => {
@@ -98,10 +117,10 @@ const MenuLayout = () => {
     }, [isScrolling, MenuItems])
 
     useEffect(() => {
-        const filtered = MenuItems?.flatMap(category => category.items || [])
+        const filtered = MenuItems?.flatMap(category => category?.items || [])
             .filter(item =>
-                item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                item.description.toLowerCase().includes(searchTerm.toLowerCase())
+                item?.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                item?.description.toLowerCase().includes(searchTerm.toLowerCase())
             );
         setFilteredItems(filtered);
     }, [searchTerm, MenuItems]);
@@ -110,10 +129,10 @@ const MenuLayout = () => {
 
     const addToCart = (item) => {
         setCart((prevCart) => {
-            const existingItem = prevCart.find((cartItem) => cartItem._id === item._id)
+            const existingItem = prevCart.find((cartItem) => cartItem._id === item?._id)
             if (existingItem) {
                 return prevCart.map((cartItem) =>
-                    cartItem._id === item._id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
+                    cartItem._id === item?._id ? { ...cartItem, quantity: cartItem.quantity + 1 } : cartItem,
                 )
             }
             return [...prevCart, { ...item, quantity: 1 }]
@@ -122,27 +141,27 @@ const MenuLayout = () => {
 
     const removeFromCart = (itemId) => {
         setCart((prevCart) => {
-            const existingItem = prevCart.find((item) => item._id === itemId)
+            const existingItem = prevCart.find((item) => item?._id === itemId)
             if (existingItem.quantity === 1) {
-                return prevCart.filter((item) => item._id !== itemId)
+                return prevCart.filter((item) => item?._id !== itemId)
             }
-            return prevCart.map((item) => (item._id === itemId ? { ...item, quantity: item.quantity - 1 } : item))
+            return prevCart.map((item) => (item?._id === itemId ? { ...item, quantity: item?.quantity - 1 } : item))
         })
     }
 
     const deleteFromCart = (itemId) => {
-        setCart((prevCart) => prevCart.filter((item) => item._id !== itemId))
+        setCart((prevCart) => prevCart.filter((item) => item?._id !== itemId))
     }
 
     const getItemQuantity = (itemId) => {
         const item = cart.find((cartItem) => cartItem._id === itemId)
-        return item ? item.quantity : 0
+        return item ? item?.quantity : 0
     }
 
     const getSubtotal = () => {
         return cart.reduce((total, item) => {
-            const price = item.discountedPrice > 0 ? item.discountedPrice : item.sellingPrice
-            return total + price * item.quantity
+            const price = item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice
+            return total + price * item?.quantity
         }, 0)
     }
 
@@ -178,7 +197,30 @@ const MenuLayout = () => {
         })
     }
 
-    //   console.log(filteredItems.filter((item) => item.category));
+    const orderData = {
+        cart: cart.map(item => ({
+            itemId: item?._id,
+            quantity: item?.quantity,
+            price: item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice,
+            name: item?.name // Optional: if you need item name in the order details
+        })),
+        hotelId: hotelId,
+        roomId: RoomId,
+        subtotal: getSubtotal(),
+        tax: getTaxAmount(),
+        deliveryFee: DELIVERY_FEE,
+        totalAmount: getTotalPrice()
+    }
+
+    //   console.log(filteredItems.filter((item) => item?.category));
+
+    if (isblock) {
+        return (
+            <div className="min-h-screen flex items-center justify-center bg-gray-50">
+                <p className="text-gray-600">This menu is under maintenance.</p>
+            </div>
+        );
+    }
 
     if (isVerified === null) {
         return (
@@ -187,6 +229,8 @@ const MenuLayout = () => {
             </div>
         );
     }
+
+
 
     if (!isVerified) {
         return (
@@ -209,7 +253,7 @@ const MenuLayout = () => {
                             </Alert>
                             <Button
                                 className="w-full bg-red-500 hover:bg-red-600"
-                                onClick={() => navigate(`/${hotelName}`)}
+                                onClick={() => navigate(`/`)}
                             >
                                 Go Back to Hotel Page
                             </Button>
@@ -222,7 +266,13 @@ const MenuLayout = () => {
 
 
     if (!MenuItems) {
-        return <div>Loading...</div>
+        return (
+            <div className="container mx-auto">
+                <MenuItemSkeleton />
+
+                <CategorySkeleton />
+            </div>
+        )
     }
 
     return (
@@ -265,15 +315,15 @@ const MenuLayout = () => {
                         ) : (
                             MenuItems?.map((category) => (
                                 <Button
-                                    key={category._id}
-                                    onClick={() => scrollToCategory(category.name)}
-                                    variant={activeCategory === category.name ? "secondary" : "ghost"}
-                                    className={`flex-shrink-0 whitespace-nowrap ${activeCategory === category.name
+                                    key={category?._id}
+                                    onClick={() => scrollToCategory(category?.name)}
+                                    variant={activeCategory === category?.name ? "secondary" : "ghost"}
+                                    className={`flex-shrink-0 whitespace-nowrap ${activeCategory === category?.name
                                         ? "bg-orange-100 text-orange-600 hover:bg-orange-200"
                                         : "hover:bg-gray-100"
                                         }`}
                                 >
-                                    {category.name}
+                                    {category?.name}
                                 </Button>
                             ))
                         )}
@@ -288,14 +338,14 @@ const MenuLayout = () => {
                             <h3 className="font-bold text-lg mb-4">Menu Categories</h3>
                             {MenuItems.map((category) => (
                                 <motion.div
-                                    key={category._id}
-                                    onClick={() => scrollToCategory(category.name)}
-                                    className={`cursor-pointer py-2 px-3 rounded-md transition-colors duration-200 ${activeCategory === category.name ? "bg-orange-100 text-orange-600" : "hover:bg-gray-50"
+                                    key={category?._id}
+                                    onClick={() => scrollToCategory(category?.name)}
+                                    className={`cursor-pointer py-2 px-3 rounded-md transition-colors duration-200 ${activeCategory === category?.name ? "bg-orange-100 text-orange-600" : "hover:bg-gray-50"
                                         }`}
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
-                                    <span className="font-medium">{category.name}</span>
+                                    <span className="font-medium">{category?.name}</span>
                                 </motion.div>
                             ))}
                         </div>
@@ -304,15 +354,15 @@ const MenuLayout = () => {
                     {/* Menu Items Section */}
                     <div className="lg:w-1/2">
                         {MenuItems?.map((category) => (
-                            <div key={category._id} ref={(el) => (sectionRefs.current[category.name] = el)} className="mb-8">
-                                <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
+                            <div key={category?._id} ref={(el) => (sectionRefs.current[category?.name] = el)} className="mb-8">
+                                <h2 className="text-2xl font-bold mb-4">{category?.name}</h2>
                                 <div className="grid gap-6">
                                     <AnimatePresence>
                                         {filteredItems
-                                            ?.filter((item) => item.Cuisine === category.name)
+                                            ?.filter((item) => item?.Cuisine === category?.name)
                                             .map((item) => (
                                                 <motion.div
-                                                    key={item._id}
+                                                    key={item?._id}
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -20 }}
@@ -323,28 +373,28 @@ const MenuLayout = () => {
                                                         <CardContent className="p-4">
                                                             <div className="flex flex-col sm:flex-row gap-4 items-start">
                                                                 <img
-                                                                    src={getLogoUrl(item.images[0]) || "/no-image-food-placeholder.webp"}
-                                                                    alt={item.name}
+                                                                    src={getLogoUrl(item?.images[0]) || "/no-image-food-placeholder.webp"}
+                                                                    alt={item?.name}
                                                                     className="w-full sm:w-24 h-40 sm:h-24 rounded-lg object-cover"
                                                                 />
                                                                 <div className="flex-1 w-full">
                                                                     <div className="flex justify-between items-start">
-                                                                        <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
-                                                                        <span className="font-semibold text-gray-700">₹{item.sellingPrice}</span>
+                                                                        <h3 className="font-semibold text-lg sm:text-xl">{item?.name}</h3>
+                                                                        <span className="font-semibold text-gray-700">₹{item?.sellingPrice}</span>
                                                                     </div>
-                                                                    <p className="text-gray-600 text-sm mt-1">{item.description}</p>
+                                                                    <p className="text-gray-600 text-sm mt-1">{item?.description}</p>
                                                                     <div className="mt-4">
-                                                                        {getItemQuantity(item._id) > 0 ? (
+                                                                        {getItemQuantity(item?._id) > 0 ? (
                                                                             <div className="flex items-center gap-2">
                                                                                 <Button
                                                                                     size="icon"
                                                                                     variant="outline"
-                                                                                    onClick={() => removeFromCart(item._id)}
+                                                                                    onClick={() => removeFromCart(item?._id)}
                                                                                     className="rounded-full"
                                                                                 >
                                                                                     <Minus className="h-4 w-4" />
                                                                                 </Button>
-                                                                                <span className="font-semibold">{getItemQuantity(item._id)}</span>
+                                                                                <span className="font-semibold">{getItemQuantity(item?._id)}</span>
                                                                                 <Button
                                                                                     size="icon"
                                                                                     variant="outline"
@@ -390,30 +440,30 @@ const MenuLayout = () => {
                                         <div className="space-y-4 mb-6 max-h-96 overflow-y-auto">
                                             {cart.map((item) => (
                                                 <motion.div
-                                                    key={item._id}
+                                                    key={item?._id}
                                                     initial={{ opacity: 0, x: -20 }}
                                                     animate={{ opacity: 1, x: 0 }}
                                                     exit={{ opacity: 0, x: 20 }}
                                                     className="flex justify-between items-center"
                                                 >
                                                     <div className="flex-1">
-                                                        <h4 className="font-semibold">{item.name}</h4>
+                                                        <h4 className="font-semibold">{item?.name}</h4>
                                                         <div className="flex items-center gap-2">
-                                                            <Button size="icon" variant="ghost" onClick={() => removeFromCart(item._id)}>
+                                                            <Button size="icon" variant="ghost" onClick={() => removeFromCart(item?._id)}>
                                                                 <Minus className="h-4 w-4" />
                                                             </Button>
-                                                            <span>{item.quantity}</span>
+                                                            <span>{item?.quantity}</span>
                                                             <Button size="icon" variant="ghost" onClick={() => addToCart(item)}>
                                                                 <Plus className="h-4 w-4" />
                                                             </Button>
-                                                            <Button size="icon" variant="ghost" onClick={() => deleteFromCart(item._id)}>
+                                                            <Button size="icon" variant="ghost" onClick={() => deleteFromCart(item?._id)}>
                                                                 <Trash2 className="h-4 w-4 text-red-500" />
                                                             </Button>
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-semibold">
-                                                            ₹{(item.discountedPrice > 0 ? item.discountedPrice : item.sellingPrice) * item.quantity}
+                                                            ₹{(item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice) * item?.quantity}
                                                         </p>
                                                     </div>
                                                 </motion.div>
@@ -456,33 +506,33 @@ const MenuLayout = () => {
                     {/* Menu Items Grid */}
                     <div className="grid gap-4 mb-20">
                         {MenuItems.map((category) => (
-                            <div key={category._id} ref={(el) => (sectionRefs.current[category.name] = el)} className="mb-8">
-                                <h2 className="text-xl font-bold mb-4">{category.name}</h2>
+                            <div key={category?._id} ref={(el) => (sectionRefs.current[category?.name] = el)} className="mb-8">
+                                <h2 className="text-xl font-bold mb-4">{category?.name}</h2>
                                 <div className="grid gap-4">
                                     {filteredItems
-                                        ?.filter((item) => item.Cuisine === category.name)
+                                        ?.filter((item) => item?.Cuisine === category?.name)
                                         .map((item) => (
-                                            <Card key={item._id} className="overflow-hidden">
+                                            <Card key={item?._id} className="overflow-hidden">
                                                 <CardContent className="p-4">
                                                     <div className="flex flex-col gap-4">
                                                         <img
-                                                            src={getLogoUrl(item.images[0]) || "/no-image-food-placeholder.webp"}
-                                                            alt={item.name}
+                                                            src={getLogoUrl(item?.images[0]) || "/no-image-food-placeholder.webp"}
+                                                            alt={item?.name}
                                                             className="rounded-lg object-cover"
                                                         />
                                                         <div className="flex-1">
                                                             <div className="flex justify-between items-start">
-                                                                <h3 className="font-semibold">{item.name}</h3>
-                                                                <span className="font-semibold">₹{item.sellingPrice}</span>
+                                                                <h3 className="font-semibold">{item?.name}</h3>
+                                                                <span className="font-semibold">₹{item?.sellingPrice}</span>
                                                             </div>
-                                                            <p className="text-sm text-gray-600 mt-1">{item.description}</p>
+                                                            <p className="text-sm text-gray-600 mt-1">{item?.description}</p>
                                                             <div className="mt-2">
-                                                                {getItemQuantity(item._id) > 0 ? (
+                                                                {getItemQuantity(item?._id) > 0 ? (
                                                                     <div className="flex items-center gap-2">
-                                                                        <Button size="sm" variant="outline" onClick={() => removeFromCart(item._id)}>
+                                                                        <Button size="sm" variant="outline" onClick={() => removeFromCart(item?._id)}>
                                                                             <Minus className="h-4 w-4" />
                                                                         </Button>
-                                                                        <span>{getItemQuantity(item._id)}</span>
+                                                                        <span>{getItemQuantity(item?._id)}</span>
                                                                         <Button size="sm" variant="outline" onClick={() => addToCart(item)}>
                                                                             <Plus className="h-4 w-4" />
                                                                         </Button>
@@ -523,7 +573,7 @@ const MenuLayout = () => {
                             >
                                 <ShoppingCart className="h-6 w-6" />
                                 <Badge className="absolute -top-2 -right-2 bg-red-500 text-white">
-                                    {cart.reduce((total, item) => total + item.quantity, 0)}
+                                    {cart.reduce((total, item) => total + item?.quantity, 0)}
                                 </Badge>
                             </Button>
                         </motion.div>
@@ -554,30 +604,30 @@ const MenuLayout = () => {
                                     <div className="space-y-4 mb-6 max-h-64 overflow-y-auto">
                                         {cart.map((item) => (
                                             <motion.div
-                                                key={item._id}
+                                                key={item?._id}
                                                 className="flex justify-between items-center"
                                                 initial={{ opacity: 0, x: -20 }}
                                                 animate={{ opacity: 1, x: 0 }}
                                                 exit={{ opacity: 0, x: 20 }}
                                             >
                                                 <div className="flex-1">
-                                                    <h4 className="font-semibold">{item.name}</h4>
+                                                    <h4 className="font-semibold">{item?.name}</h4>
                                                     <div className="flex items-center gap-2">
-                                                        <Button size="icon" variant="ghost" onClick={() => removeFromCart(item._id)}>
+                                                        <Button size="icon" variant="ghost" onClick={() => removeFromCart(item?._id)}>
                                                             <Minus className="h-4 w-4" />
                                                         </Button>
-                                                        <span>{item.quantity}</span>
+                                                        <span>{item?.quantity}</span>
                                                         <Button size="icon" variant="ghost" onClick={() => addToCart(item)}>
                                                             <Plus className="h-4 w-4" />
                                                         </Button>
-                                                        <Button size="icon" variant="ghost" onClick={() => deleteFromCart(item._id)}>
+                                                        <Button size="icon" variant="ghost" onClick={() => deleteFromCart(item?._id)}>
                                                             <Trash2 className="h-4 w-4 text-red-500" />
                                                         </Button>
                                                     </div>
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="font-semibold">
-                                                        ₹{(item.discountedPrice > 0 ? item.discountedPrice : item.sellingPrice) * item.quantity}
+                                                        ₹{(item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice) * item?.quantity}
                                                     </p>
                                                 </div>
                                             </motion.div>
@@ -620,15 +670,16 @@ const MenuLayout = () => {
                 <CheckoutModal
                     isOpen={isCheckoutModalOpen}
                     onClose={() => setIsCheckoutModalOpen(false)}
-                    total={getTotalPrice()}
+                    orderData={orderData}
                     customerInfo={customerInfo}
                     setCustomerInfo={setCustomerInfo}
-                    onCompleteOrder={() => {
+                    onSuccess={() => {
                         setIsOrderComplete(true)
                         setCart([])
                         localStorage.removeItem("foodCart")
                     }}
                     isOrderComplete={isOrderComplete}
+                    setOrderDetails={setOrderDetails}
                     orderDetails={orderDetails}
                 />
             </div>

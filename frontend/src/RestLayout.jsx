@@ -10,7 +10,7 @@ const RestLayout = () => {
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const verifyToken = searchParams.get("verify"); // Get token from URL
-    const { hotelName, roomNumber } = useParams();
+    const { hotelName, roomName } = useParams();
 
     const AdminResturantData = [
         {
@@ -25,11 +25,11 @@ const RestLayout = () => {
     const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
 
     // const handleClick = () => {
-    //     navigate(`/${hotelName}/${roomNumber}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)
+    //     navigate(`/${hotelName}/${roomName}/${toSlug(restaurant?.name)}/menu?restaurantid=${restaurant?._id}&verify=${verifyToken}`)
     // };
 
     return (
-        <div className="p-6 container mx-auto">
+        <div className="">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {AdminResturantData.map((restaurant) => (
                     <Card className="hover:shadow-lg transition-shadow">
@@ -39,30 +39,30 @@ const RestLayout = () => {
                                 alt={restaurant?.name}
                                 className="w-full h-48 object-cover rounded-t-lg"
                             />
-                            <CardTitle className="mt-4">{restaurant.name}</CardTitle>
-                            {restaurant.description && <CardDescription>{restaurant.description}</CardDescription>}
+                            <CardTitle className="mt-4 text-lg">{restaurant?.name}</CardTitle>
+                            {restaurant?.description && <CardDescription>{restaurant?.description}</CardDescription>}
                         </CardHeader>
 
                         <CardContent>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
                                     <MapPin className="w-4 h-4" />
-                                    <span>{restaurant.location || "Address not available"}</span>
+                                    <span>{restaurant?.location || "Address not available"}</span>
                                 </div>
-                                {restaurant.email && (
+                                {restaurant?.email && (
                                     <div className="flex items-center gap-2">
                                         <Mail className="w-4 h-4" />
-                                        <span>{restaurant.email}</span>
+                                        <span>{restaurant?.email}</span>
                                     </div>
                                 )}
                                 <div className="flex items-center gap-2">
                                     <Phone className="w-4 h-4" />
-                                    <span>{restaurant.contact || "Not available"}</span>
+                                    <span>{restaurant?.contact || "Not available"}</span>
                                 </div>
-                                {restaurant.openingHours && (
+                                {restaurant?.openingHours && (
                                     <div className="flex items-center gap-2">
                                         <Clock className="w-4 h-4" />
-                                        <span>{restaurant.openingHours.monday || "Opening hours not available"}</span>
+                                        <span>{restaurant?.openingHours.monday || "Opening hours not available"}</span>
                                     </div>
                                 )}
                             </div>
@@ -71,7 +71,7 @@ const RestLayout = () => {
                         <CardFooter>
 
                             <Button
-                                onClick={() => navigate(`/${hotelName}/${roomNumber}/chatora-squad/menu?restaurantid=${restaurant?.id}&verify=${verifyToken}`)}
+                                onClick={() => navigate(`/${hotelName}/${roomName}/chatora-squad/menu?restaurantid=${restaurant?.id}&verify=${verifyToken}`)}
                             // onClick={handleClick}
                             >
                                 View Menu
