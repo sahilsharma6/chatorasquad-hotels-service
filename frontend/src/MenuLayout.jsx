@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from "./components/ui/alert"
 import { useHotel } from "./Context/HotelContext"
 import { MenuItemSkeleton } from "./components/SketonLoadingForMenu/MenuItemSkeleton"
 import { CategorySkeleton } from "./components/SketonLoadingForMenu/CategorySkeleton"
+import ImageSlider from "./components/ImageSlider"
 
 
 // Constants
@@ -21,7 +22,7 @@ const TAX_RATE = 0.18
 const DELIVERY_FEE = 50
 
 const MenuLayout = ({ isblock }) => {
-    const { MenuItems, fetchAdminMenu, getLogoUrl } = useRestaurant()
+    const { MenuItems, fetchAdminMenu, getImageUrl } = useRestaurant()
     const { hotelName, roomName } = useParams()
     const navigate = useNavigate()
     const [searchParams] = useSearchParams();
@@ -363,11 +364,12 @@ const MenuLayout = ({ isblock }) => {
                                                     <Card className="overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                                                         <CardContent className="p-4">
                                                             <div className="flex flex-col sm:flex-row gap-4 items-start">
-                                                                <img
-                                                                    src={getLogoUrl(item.images[0]) || "/no-image-food-placeholder.webp"}
+                                                                {/* <img
+                                                                    src={import.meta.env.VITE_API_URL + item?.images[0] || "/no-image-food-placeholder.webp"}
                                                                     alt={item.name}
                                                                     className="w-full sm:w-24 h-40 sm:h-24 rounded-lg object-cover"
-                                                                />
+                                                                /> */}
+                                                                 <ImageSlider images={item?.images} />
                                                                 <div className="flex-1 w-full">
                                                                     <div className="flex justify-between items-start">
                                                                         <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
@@ -494,11 +496,15 @@ const MenuLayout = ({ isblock }) => {
                                             <Card key={item?._id} className="overflow-hidden">
                                                 <CardContent className="p-4">
                                                     <div className="flex flex-col gap-4">
-                                                        <img
+                                                        {/* <img
                                                             src={getLogoUrl(item?.images[0]) || "/no-image-food-placeholder.webp"}
                                                             alt={item?.name}
                                                             className="rounded-lg object-cover"
-                                                        />
+                                                        /> */}
+                                                        <div className="w-full">
+
+                                                         <ImageSlider images={item?.images} />
+                                                        </div>
                                                         <div className="flex-1">
                                                             <div className="flex justify-between items-start">
                                                                 <h3 className="font-semibold">{item?.name}</h3>
