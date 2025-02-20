@@ -1,5 +1,5 @@
 import apiClient from "@/services/ApiClient";
-import { createContext, useContext, useState } from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 
 const RestaurantContext = createContext();
 
@@ -67,11 +67,10 @@ export const RestaurantProvider = ({ children }) => {
         }
     };
 
-    const getLogoUrl = (logoPath) => {
-        if (!logoPath) return null;
-        // Assuming your API base URL is configured in your environment
-        return `${import.meta.env.IMAGE_URL}/${logoPath}`;
-      };
+    const getImageUrl = useCallback((imagePath) => {
+        if (!imagePath) return '/placeholder-room.jpg';
+        return `${import.meta.env.VITE_API_URL}/${imagePath}`;
+      }, []);
 
     return (
         <RestaurantContext.Provider value={{
@@ -84,7 +83,7 @@ export const RestaurantProvider = ({ children }) => {
             fetchRestaurantMenuById,
             MenuItems,
             fetchAdminMenu,
-            getLogoUrl
+            getImageUrl
         }}>
             {children}
         </RestaurantContext.Provider>
