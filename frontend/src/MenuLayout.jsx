@@ -20,7 +20,7 @@ import { CategorySkeleton } from "./components/SketonLoadingForMenu/CategorySkel
 const TAX_RATE = 0.18
 const DELIVERY_FEE = 50
 
-const MenuLayout = ({isblock}) => {
+const MenuLayout = ({ isblock }) => {
     const { MenuItems, fetchAdminMenu, getLogoUrl } = useRestaurant()
     const { hotelName, roomName } = useParams()
     const navigate = useNavigate()
@@ -51,10 +51,10 @@ const MenuLayout = ({isblock}) => {
     }, [HotelDetailsByName?._id]);
 
     const currentRoom = Rooms.find((room) => room.room === roomName);
-    
+
     const hotelId = HotelDetailsByName?._id;
     const RoomId = currentRoom?._id;
-    
+
 
     useEffect(() => {
         console.log("Fetching menu...");
@@ -159,14 +159,8 @@ const MenuLayout = ({isblock}) => {
     }
 
     const getSubtotal = () => {
-        return cart.reduce((total, item) => {
-            const price = item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice
-            return total + price * item?.quantity
-        }, 0)
+        return cart.reduce((total, item) => total + item.sellingPrice * item.quantity, 0)
     }
-
-    const getTaxAmount = () => getSubtotal() * TAX_RATE
-    const getTotalPrice = () => getSubtotal() + getTaxAmount() + (cart.length > 0 ? DELIVERY_FEE : 0)
 
     const scrollToCategory = (categoryId) => {
         setIsScrolling(true)
@@ -206,10 +200,7 @@ const MenuLayout = ({isblock}) => {
         })),
         hotelId: hotelId,
         roomId: RoomId,
-        subtotal: getSubtotal(),
-        tax: getTaxAmount(),
-        deliveryFee: DELIVERY_FEE,
-        totalAmount: getTotalPrice()
+        totalAmount: getSubtotal()
     }
 
     //   console.log(filteredItems.filter((item) => item?.category));
@@ -281,12 +272,12 @@ const MenuLayout = ({isblock}) => {
             <Button
                 onClick={handleBack}
                 variant="ghost"
-                className="flex items-center gap-2 mt-4 mb-2 lg:mt-6"
+                className="flex items-center gap-2 mt-4 mb-2 lg:mt-6 italic text-sm"
             >
                 <ArrowLeft className="h-4 w-4" />
-                Back
+                Back to Resturants
             </Button>
-            <div className="text-3xl font-bold text-center lg:my-6 hidden lg:block">Browse Menu</div>
+            <div className="text-3xl font-bold text-center lg:my-6 hidden lg:block">Chatora Squad / <span className="text-orange-700">Menu</span></div>
             <div className="px-4 lg:px-20 min-h-screen">
                 {/* Search Bar */}
                 <div className="mb-6 sticky -top-1 z-10 bg-white lg:backdrop-blur-md p-4 rounded-lg lg:shadow-md">
@@ -354,15 +345,15 @@ const MenuLayout = ({isblock}) => {
                     {/* Menu Items Section */}
                     <div className="lg:w-1/2">
                         {MenuItems?.map((category) => (
-                            <div key={category?._id} ref={(el) => (sectionRefs.current[category?.name] = el)} className="mb-8">
-                                <h2 className="text-2xl font-bold mb-4">{category?.name}</h2>
+                            <div key={category._id} ref={(el) => (sectionRefs.current[category.name] = el)} className="mb-8">
+                                <h2 className="text-2xl font-bold mb-4">{category.name}</h2>
                                 <div className="grid gap-6">
                                     <AnimatePresence>
                                         {filteredItems
-                                            ?.filter((item) => item?.Cuisine === category?.name)
+                                            ?.filter((item) => item.Cuisine === category.name)
                                             .map((item) => (
                                                 <motion.div
-                                                    key={item?._id}
+                                                    key={item._id}
                                                     initial={{ opacity: 0, y: 20 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -20 }}
@@ -373,28 +364,28 @@ const MenuLayout = ({isblock}) => {
                                                         <CardContent className="p-4">
                                                             <div className="flex flex-col sm:flex-row gap-4 items-start">
                                                                 <img
-                                                                    src={getLogoUrl(item?.images[0]) || "/no-image-food-placeholder.webp"}
-                                                                    alt={item?.name}
+                                                                    src={getLogoUrl(item.images[0]) || "/no-image-food-placeholder.webp"}
+                                                                    alt={item.name}
                                                                     className="w-full sm:w-24 h-40 sm:h-24 rounded-lg object-cover"
                                                                 />
                                                                 <div className="flex-1 w-full">
                                                                     <div className="flex justify-between items-start">
-                                                                        <h3 className="font-semibold text-lg sm:text-xl">{item?.name}</h3>
-                                                                        <span className="font-semibold text-gray-700">₹{item?.sellingPrice}</span>
+                                                                        <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
+                                                                        <span className="font-semibold text-gray-700">₹{item.sellingPrice}</span>
                                                                     </div>
-                                                                    <p className="text-gray-600 text-sm mt-1">{item?.description}</p>
+                                                                    <p className="text-gray-600 text-sm mt-1">{item.description}</p>
                                                                     <div className="mt-4">
-                                                                        {getItemQuantity(item?._id) > 0 ? (
+                                                                        {getItemQuantity(item._id) > 0 ? (
                                                                             <div className="flex items-center gap-2">
                                                                                 <Button
                                                                                     size="icon"
                                                                                     variant="outline"
-                                                                                    onClick={() => removeFromCart(item?._id)}
+                                                                                    onClick={() => removeFromCart(item._id)}
                                                                                     className="rounded-full"
                                                                                 >
                                                                                     <Minus className="h-4 w-4" />
                                                                                 </Button>
-                                                                                <span className="font-semibold">{getItemQuantity(item?._id)}</span>
+                                                                                <span className="font-semibold">{getItemQuantity(item._id)}</span>
                                                                                 <Button
                                                                                     size="icon"
                                                                                     variant="outline"
@@ -463,28 +454,16 @@ const MenuLayout = ({isblock}) => {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-semibold">
-                                                            ₹{(item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice) * item?.quantity}
+                                                            ₹{(item?.sellingPrice) * item?.quantity}
                                                         </p>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </div>
                                         <div className="border-t pt-4 space-y-2">
-                                            <div className="flex justify-between">
-                                                <span>Subtotal</span>
-                                                <span>₹{getSubtotal()}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Tax ({(TAX_RATE * 100).toFixed(0)}%)</span>
-                                                <span>₹{getTaxAmount().toFixed(2)}</span>
-                                            </div>
-                                            <div className="flex justify-between">
-                                                <span>Delivery Fee</span>
-                                                <span>₹{DELIVERY_FEE}</span>
-                                            </div>
-                                            <div className="flex justify-between font-bold text-lg border-t pt-2">
+                                            <div className="flex justify-between font-bold text-lg">
                                                 <span>Total</span>
-                                                <span>₹{getTotalPrice().toFixed(2)}</span>
+                                                <span>₹{getSubtotal().toFixed(2)}</span>
                                             </div>
                                         </div>
                                         <Button
@@ -627,28 +606,16 @@ const MenuLayout = ({isblock}) => {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="font-semibold">
-                                                        ₹{(item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice) * item?.quantity}
+                                                        ₹{item?.sellingPrice}
                                                     </p>
                                                 </div>
                                             </motion.div>
                                         ))}
                                     </div>
                                     <div className="border-t pt-4 space-y-2">
-                                        <div className="flex justify-between">
-                                            <span>Subtotal</span>
-                                            <span>₹{getSubtotal()}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Tax ({(TAX_RATE * 100).toFixed(0)}%)</span>
-                                            <span>₹{getTaxAmount().toFixed(2)}</span>
-                                        </div>
-                                        <div className="flex justify-between">
-                                            <span>Delivery Fee</span>
-                                            <span>₹{DELIVERY_FEE}</span>
-                                        </div>
-                                        <div className="flex justify-between font-bold text-lg border-t pt-2">
+                                        <div className="flex justify-between font-bold text-lg">
                                             <span>Total</span>
-                                            <span>₹{getTotalPrice().toFixed(2)}</span>
+                                            <span>₹{getSubtotal().toFixed(2)}</span>
                                         </div>
                                     </div>
                                     <Button

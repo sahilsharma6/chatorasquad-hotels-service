@@ -26,7 +26,8 @@ const CheckoutModal = ({
   const sliderControls = useAnimation()
   const { CreateOrder } = useOrder()
   const navigate = useNavigate()
-  const { hotelName, roomName } = useParams()
+  const { hotelName, roomName } = useParams();
+  
 
   const handleCreateOrder = async () => {
     if (orderPlaced) return 
@@ -60,28 +61,29 @@ const CheckoutModal = ({
   const handleDrag = (event, info) => {
     if (orderPlaced) return 
   
-    setIsDragging(true)
     const sliderWidth = sliderRef.current?.offsetWidth || 0
     const dragPercentage = (info.point.x / sliderWidth) * 100
-  
+    
     if (dragPercentage >= 90) {
       sliderControls.start({ x: sliderWidth - 56 })
       setIsDragging(false)
-      setTimeout(handleCreateOrder, 300)
+      handleCreateOrder()
+    } else {
+       setIsDragging(true)
     }
   }
   
   const handleDragEnd = (event, info) => {
-    if (orderPlaced) return
+    if (orderPlaced) return;
   
-    setIsDragging(false)
-    const sliderWidth = sliderRef.current?.offsetWidth || 0
-    const dragPercentage = (info.point.x / sliderWidth) * 100
+    const sliderWidth = sliderRef.current?.offsetWidth || 0;
+    const dragPercentage = (info.point.x / sliderWidth) * 100;
   
     if (dragPercentage < 90) {
-      sliderControls.start({ x: 0 })
+      sliderControls.start({ x: 0 });
     }
-  }
+    setIsDragging(false);
+  };
   
   useEffect(() => {
     if (!isOpen) {
@@ -169,8 +171,16 @@ const CheckoutModal = ({
                       <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                         <span className="text-sm font-medium text-gray-600">Slide to confirm order</span>
                       </div>
+                      
                     </div>
+                    
                   </div>
+                  {/* <Button
+                        className="rounded-full w-full cursor-pointer active:cursor-grabbing bg-orange-600"
+                        onClick={handleCreateOrder}
+                      >
+                      create order
+                      </Button> */}
                 </motion.div>
               ) : (
                 <motion.div
@@ -195,11 +205,6 @@ const CheckoutModal = ({
                     <p className="text-gray-500">Your order will be delivered in 30-45 minutes</p>
                     <p className="text-sm font-medium">Order ID: {orderDetails?.orderId}</p>
                   </div>
-
-                  <Button onClick={() => downloadInvoice(orderDetails)} className="w-full" variant="outline">
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Invoice
-                  </Button>
                 </motion.div>
               )}
             </AnimatePresence>

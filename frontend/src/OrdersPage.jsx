@@ -7,6 +7,8 @@ import { useParams } from 'react-router-dom';
 import { useHotel } from './Context/HotelContext';
 import { useOrder } from './Context/OrderContext';
 import { Skeleton } from './components/ui/skeleton';
+import DownloadInvoice from './components/DownloadInvoice';
+
 
 const OrdersPage = () => {
     const { hotelName, roomName } = useParams();
@@ -31,8 +33,6 @@ const OrdersPage = () => {
             }
         }
     }, [Rooms, roomName]);
-
-    console.log(orders);
 
     const getStatusColor = (status) => {
         const statusColors = {
@@ -89,8 +89,8 @@ const OrdersPage = () => {
 
             <div className="space-y-4">
                 {orders
-                    ?.slice() // Create a shallow copy to avoid mutating the original array
-                    .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate)) // Sort latest first
+                    ?.slice()
+                    .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
                     .map((order) => (
                         <Card key={order?._id} className="overflow-hidden hover:shadow-md transition-shadow">
                             <CardHeader className="border-b bg-gray-50">
@@ -103,9 +103,12 @@ const OrdersPage = () => {
                                             {formatDate(order?.orderDate)}
                                         </div>
                                     </div>
-                                    <Badge className={`${getStatusColor(order?.status)} text-white`}>
-                                        {order?.status}
-                                    </Badge>
+                                    <div className="flex items-center gap-2">
+                                        <Badge className={`${getStatusColor(order?.status)} text-white`}>
+                                            {order?.status}
+                                        </Badge>
+                                        <DownloadInvoice order={order} />
+                                    </div>
                                 </div>
                             </CardHeader>
 
@@ -136,9 +139,7 @@ const OrdersPage = () => {
                                                     </span>
                                                 </div>
                                                 <span className="text-gray-600">
-                                                    {item?.menuItem?.price
-                                                        ? (item.menuItem.price * item.quantity).toFixed(2)
-                                                        : 'N/A'}
+                                                    Quantity: {item?.quantity}
                                                 </span>
                                             </div>
                                         ))}
@@ -147,7 +148,7 @@ const OrdersPage = () => {
                                     <div className="border-t mt-4 pt-4">
                                         <div className="flex justify-between items-center font-bold">
                                             <span>Total</span>
-                                            <span>{order?.totalPrice?.toFixed(2) || '0.00'}</span>
+                                            <span>₹{order?.totalPrice?.toFixed(2) || '0.00'}</span>
                                         </div>
                                     </div>
                                 </div>
