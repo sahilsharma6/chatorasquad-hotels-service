@@ -159,7 +159,7 @@ const MenuLayout = ({ isblock }) => {
     }
 
     const getSubtotal = () => {
-        return cart.reduce((total, item) => total + item.sellingPrice * item.quantity, 0)
+        return cart.reduce((total, item) => total + item.discountedPrice * item.quantity, 0)
     }
 
     const scrollToCategory = (categoryId) => {
@@ -195,7 +195,7 @@ const MenuLayout = ({ isblock }) => {
         cart: cart.map(item => ({
             itemId: item?._id,
             quantity: item?.quantity,
-            price: item?.discountedPrice > 0 ? item?.discountedPrice : item?.sellingPrice,
+            price: item?.discountedPrice > 0 ? item?.discountedPrice : item?.discountedPrice,
             name: item?.name // Optional: if you need item name in the order details
         })),
         hotelId: hotelId,
@@ -371,7 +371,7 @@ const MenuLayout = ({ isblock }) => {
                                                                 <div className="flex-1 w-full">
                                                                     <div className="flex justify-between items-start">
                                                                         <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
-                                                                        <span className="font-semibold text-gray-700">₹{item.sellingPrice}</span>
+                                                                        <span className="font-semibold text-gray-700">₹{item.discountedPrice}</span>
                                                                     </div>
                                                                     <p className="text-gray-600 text-sm mt-1">{item.description}</p>
                                                                     <div className="mt-4">
@@ -454,7 +454,7 @@ const MenuLayout = ({ isblock }) => {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-semibold">
-                                                            ₹{(item?.sellingPrice) * item?.quantity}
+                                                            ₹{(item?.discountedPrice) * item?.quantity}
                                                         </p>
                                                     </div>
                                                 </motion.div>
@@ -502,7 +502,7 @@ const MenuLayout = ({ isblock }) => {
                                                         <div className="flex-1">
                                                             <div className="flex justify-between items-start">
                                                                 <h3 className="font-semibold">{item?.name}</h3>
-                                                                <span className="font-semibold">₹{item?.sellingPrice}</span>
+                                                                <span className="font-semibold">₹{item?.discountedPrice}</span>
                                                             </div>
                                                             <p className="text-sm text-gray-600 mt-1">{item?.description}</p>
                                                             <div className="mt-2">
@@ -606,7 +606,7 @@ const MenuLayout = ({ isblock }) => {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="font-semibold">
-                                                        ₹{item?.sellingPrice}
+                                                        ₹{item?.discountedPrice}
                                                     </p>
                                                 </div>
                                             </motion.div>
