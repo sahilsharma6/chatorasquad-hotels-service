@@ -9,7 +9,6 @@ import { useOrder } from './Context/OrderContext';
 import { Skeleton } from './components/ui/skeleton';
 import DownloadInvoice from './components/DownloadInvoice';
 
-
 const OrdersPage = () => {
     const { hotelName, roomName } = useParams();
     const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms } = useHotel();
@@ -54,11 +53,11 @@ const OrdersPage = () => {
         });
     };
 
-    if (loading || !orders?.length) {
+    if (loading) {
         return (
-            <>
+            <div className="max-w-4xl mx-auto p-6">
                 {[...Array(3)].map((_, index) => (
-                    <div key={index} className="max-w-4xl mx-auto p-6">
+                    <div key={index} className="mb-4">
                         <Skeleton className="h-10 w-64 mb-4" />
                         <Skeleton className="h-5 w-40 mb-2" />
                         <Skeleton className="h-5 w-48 mb-2" />
@@ -66,11 +65,11 @@ const OrdersPage = () => {
                         <Skeleton className="h-8 w-40" />
                     </div>
                 ))}
-            </>
+            </div>
         );
     }
 
-    if (!orders?.length) {
+    if (!orders || !Array.isArray(orders) || orders.length === 0) {
         return (
             <div className="max-w-4xl mx-auto p-6">
                 <h1 className="text-3xl font-bold mb-6">Orders</h1>
@@ -89,7 +88,7 @@ const OrdersPage = () => {
 
             <div className="space-y-4">
                 {orders
-                    ?.slice()
+                    .slice()
                     .sort((a, b) => new Date(b.orderDate) - new Date(a.orderDate))
                     .map((order) => (
                         <Card key={order?._id} className="overflow-hidden hover:shadow-md transition-shadow">

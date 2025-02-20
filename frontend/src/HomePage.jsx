@@ -15,10 +15,10 @@ const HomePage = () => {
   }, []);
 
   const filteredHotels = hotels.filter(
-    (hotel) => hotel?.isValid && hotel?.name.toLowerCase().includes(search.toLowerCase())
+    (hotel) => hotel?.isValid && hotel?.name.includes(search.toLowerCase())
   );
 
-  const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
+  const toSlug = (name) => name.replace(/\s+/g, '-');
 
   return (
     <div className="container mx-auto p-6 transition-all duration-300 bg-white text-black">

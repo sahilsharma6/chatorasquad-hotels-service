@@ -19,7 +19,7 @@ const RestaurantDetails = () => {
     fetchRestaurant();
   }, []);
 
-  const toSlug = (name) => name.toLowerCase().replace(/\s+/g, '-');
+  const toSlug = (name) => name.replace(/\s+/g, '-');
 
   return (
     <>
