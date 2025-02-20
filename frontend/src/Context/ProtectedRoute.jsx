@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,7 +20,6 @@ export const ProtectedRoute = ({ children }) => {
   const { hotelName } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
-  const navigate = useNavigate();
 
   const hotel_name = decodeURIComponent(hotelName);
   const hotelId = HotelDetailsByName?._id;
@@ -30,21 +29,22 @@ export const ProtectedRoute = ({ children }) => {
   }, [hotel_name]);
 
   useEffect(() => {
-    const storedToken = Cookies.get('hotel_auth_token');
+    const userAuthToken = Cookies.get('token'); // Check user login token
+    const hotelAuthToken = Cookies.get('hotel_auth_token');
     const urlToken = searchParams.get('verify');
 
-    if (storedToken) {
-      if (!urlToken) {
-        // If we have a cookie but no URL token, add it to URL
-        setSearchParams({ verify: storedToken }, { replace: true });
-      } else if (urlToken !== storedToken) {
-        // If URL token doesn't match cookie, update URL
-        setSearchParams({ verify: storedToken }, { replace: true });
+    if (userAuthToken) {
+      setIsVerified(true); // If user is logged in, no need to check hotel password
+      return;
+    }
+
+    if (hotelAuthToken) {
+      setIsVerified(true); // Hotel password is verified
+      if (!urlToken || urlToken !== hotelAuthToken) {
+        setSearchParams({ verify: hotelAuthToken }, { replace: true });
       }
-      setIsVerified(true);
     } else if (urlToken) {
-      // If we have URL token but no cookie, set the cookie
-      Cookies.set('hotel_auth_token', urlToken, { expires: 1 / 144 }); // 10 minutes
+      Cookies.set('hotel_auth_token', urlToken, { expires: 1 / 144 });
       setIsVerified(true);
     }
   }, [searchParams]);
@@ -62,10 +62,10 @@ export const ProtectedRoute = ({ children }) => {
         setIsVerified(true);
         setError('');
       } else {
-        throw new Error("Wrong password");
+        throw new Error('Wrong password');
       }
     } catch (error) {
-      setError("Wrong password");
+      setError('Wrong password');
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -74,6 +74,7 @@ export const ProtectedRoute = ({ children }) => {
     }
   };
 
+  // ✅ If user is logged in OR hotel password is verified, return children
   if (isVerified) {
     return children;
   }

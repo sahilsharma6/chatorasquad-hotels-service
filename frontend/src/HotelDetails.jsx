@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useParams, Link, useLocation } from "react-router-dom";
 import { useHotel } from "./Context/HotelContext";
-import { MapPin, Hotel, Phone, CheckCircle } from "lucide-react";
+import { MapPin, Hotel, Phone, CheckCircle, Mail } from "lucide-react";
 import { Button } from "./components/ui/button";
 import { Skeleton } from "./components/ui/skeleton";
 
@@ -69,6 +69,9 @@ const HotelDetails = () => {
           <p className="flex items-center mt-2">
             <MapPin className="h-5 w-5 mr-2" /> {HotelDetails?.address || "No Address Provided"}
           </p>
+          <p className="flex items-center mt-2">
+            <Mail className="h-5 w-5 mr-2" /> {HotelDetails?.email || "No City Provided"}
+          </p>
         </div>
 
         <p className="mt-4 text-gray-500">{HotelDetails?.description || "No description available."}</p>
@@ -80,9 +83,7 @@ const HotelDetails = () => {
               Rooms?.map((room) => (
                 <div key={room?._id} className="bg-gray-100 p-4 rounded-lg shadow-md">
                   <img src={room?.image || '/no-image-food-placeholder.webp'} alt={room?.type} className="w-full h-40 object-cover rounded-md mb-3" />
-                  <h3 className="text-lg font-bold">{room?.type} - Room {room?.room}</h3>
-                  <p className="text-sm text-gray-600">Capacity: {room?.capacity} persons</p>
-                  <p className="text-sm text-gray-600">Price: ₹{room?.price}</p>
+                  <h3 className="text-lg font-bold">Room: {room?.room}</h3>
                   <Link to={`/${hotelName}/${room?.room}`}>
                     <Button className="mt-4">View Details</Button>
                   </Link>
