@@ -64,17 +64,17 @@ const HotelDetails = () => {
 
         <div className="mt-4 text-gray-600">
           <p className="flex items-center">
-            <Phone className="h-5 w-5 mr-2" /> {HotelDetails?.phoneNo || "Not Available"}
+            <Phone className="h-5 w-5 mr-2" /> +91 {HotelDetails?.userId?.phoneNo || "Not Available"}
           </p>
           <p className="flex items-center mt-2">
             <MapPin className="h-5 w-5 mr-2" /> {HotelDetails?.address || "No Address Provided"}
           </p>
           <p className="flex items-center mt-2">
-            <Mail className="h-5 w-5 mr-2" /> {HotelDetails?.email || "No City Provided"}
+            <Mail className="h-5 w-5 mr-2" /> {HotelDetails?.userId?.email || "No City Provided"}
           </p>
         </div>
 
-        <p className="mt-4 text-gray-500">{HotelDetails?.description || "No description available."}</p>
+        {/* <p className="mt-4 text-gray-500">{HotelDetails?.description || "No description available."}</p> */}
 
         <div className="mt-6">
           <h2 className="text-2xl font-semibold mb-4">Available Rooms</h2>

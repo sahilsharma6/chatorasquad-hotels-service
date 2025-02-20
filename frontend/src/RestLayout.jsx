@@ -17,8 +17,9 @@ const RestLayout = () => {
             id: 1,
             name: "Chatora Squad",
             description: "Description 1",
-            location: "Location 1",
-            contact: "Contact 1",
+            location: "C/o Rajesh Gupta, Hindu Dham janki Mahal, Ayodhya, Faizabad- 224123 Uttar Pradesh",
+            contact: "9235264749",
+            email: "howdn68@gmail.com",
         },
     ];
 
@@ -37,17 +38,16 @@ const RestLayout = () => {
                             <img
                                 src={restaurant?.image || "/no-image-food-placeholder.webp"}
                                 alt={restaurant?.name}
-                                className="w-full h-48 object-cover rounded-t-lg"
+                                className="w-full h-48 object-cover rounded-lg"
                             />
-                            <CardTitle className="mt-4 text-lg">{restaurant?.name}</CardTitle>
-                            {restaurant?.description && <CardDescription>{restaurant?.description}</CardDescription>}
+                            <CardTitle className="mt-4 text-xl ">{restaurant?.name}</CardTitle>
                         </CardHeader>
 
                         <CardContent>
                             <div className="space-y-2">
                                 <div className="flex items-center gap-2">
-                                    <MapPin className="w-4 h-4" />
-                                    <span>{restaurant?.location || "Address not available"}</span>
+                                    <MapPin className="w-7 h-8" />
+                                    <span className="">{restaurant?.location || "Address not available"}</span>
                                 </div>
                                 {restaurant?.email && (
                                     <div className="flex items-center gap-2">
@@ -57,7 +57,7 @@ const RestLayout = () => {
                                 )}
                                 <div className="flex items-center gap-2">
                                     <Phone className="w-4 h-4" />
-                                    <span>{restaurant?.contact || "Not available"}</span>
+                                    <span>+91 {restaurant?.contact || "Not available"}</span>
                                 </div>
                                 {restaurant?.openingHours && (
                                     <div className="flex items-center gap-2">

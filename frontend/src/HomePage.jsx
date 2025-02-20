@@ -58,24 +58,24 @@ const HomePage = () => {
           filteredHotels.map((hotel) => (
             <Card key={hotel?._id} className="hover:shadow-lg transition-shadow duration-300">
               <CardHeader className="flex flex-row items-center justify-between pb-2">
-                <div className="flex flex-col">
+                <div className="flex flex-col w-full">
+                  <img src={hotel?.image || '/no-image-food-placeholder.webp'} className="w-full h-40 object-cover rounded-md mb-3" />
                   <h3 className="font-semibold text-lg">{hotel?.name}</h3>
                   <div className="flex items-center mt-1">
                     <CheckCircle className="h-4 w-4 text-green-500 mr-1" />
                     <span className="text-sm text-gray-500">Verified Hotel</span>
                   </div>
                 </div>
-                <Hotel className="h-6 w-6 text-gray-600" />
               </CardHeader>
 
               <CardContent>
                 <div className="flex items-center text-sm text-gray-500">
                   <Phone className="h-4 w-4 mr-2" />
-                  <span>{hotel?.phoneNo}</span>
+                  <span>+91 {hotel?.userId?.phoneNo}</span>
                 </div>
                 <div className="flex items-center text-sm text-gray-500 mt-2">
                   <MapPin className="h-4 w-4 mr-2" />
-                  <span>{hotel?.location}</span>
+                  <span>{hotel?.userId?.location}</span>
                 </div>
               </CardContent>
 
