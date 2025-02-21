@@ -17,6 +17,7 @@ export const ProtectedRoute = ({ children }) => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isVerified, setIsVerified] = useState(false);
+  const [isChecking, setIsChecking] = useState(false);
   const { hotelName } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const { toast } = useToast();
@@ -29,43 +30,55 @@ export const ProtectedRoute = ({ children }) => {
   }, [hotel_name]);
 
   useEffect(() => {
-    const userAuthToken = Cookies.get('token'); // Check user login token
+    const userAuthToken = Cookies.get('token');
     const hotelAuthToken = Cookies.get('hotel_auth_token');
     const urlToken = searchParams.get('verify');
+    const urlPassword = searchParams.get('pass');
 
     if (userAuthToken) {
-      setIsVerified(true); // If user is logged in, no need to check hotel password
+      setIsVerified(true);
       return;
     }
 
     if (hotelAuthToken) {
-      setIsVerified(true); // Hotel password is verified
+      setIsVerified(true);
       if (!urlToken || urlToken !== hotelAuthToken) {
         setSearchParams({ verify: hotelAuthToken }, { replace: true });
       }
     } else if (urlToken) {
       Cookies.set('hotel_auth_token', urlToken, { expires: 1 / 144 });
       setIsVerified(true);
+    } else if (urlPassword && hotelId) {
+      const decodedPassword = decodeURIComponent(urlPassword.trim().toLowerCase());
+      setIsChecking(true);
+      setPassword(decodedPassword);
+      verifyPassword(decodedPassword);
+    } else {
+      setIsChecking(true);
+      const timer = setTimeout(() => setIsChecking(false), 1000);
+      return () => clearTimeout(timer);
     }
-  }, [searchParams]);
+  }, [searchParams, hotelId]);
 
-  const verifyPassword = async () => {
+  const verifyPassword = async (pwd = password) => {
     try {
-      const response = await VerifyPassword(hotelId, password);
+      const response = await VerifyPassword(hotelId, pwd.trim());
       if (response) {
         const timestamp = Date.now();
         const token = generateToken(hotelId, timestamp);
   
-        Cookies.set('hotel_auth_token', token, { expires: 1 / 144 }); // 10 minutes
+        Cookies.set('hotel_auth_token', token, { expires: 1 });
         setSearchParams({ verify: token }, { replace: true });
   
         setIsVerified(true);
         setError('');
+        setIsChecking(false);
       } else {
         throw new Error('Wrong password');
       }
     } catch (error) {
       setError('Wrong password');
+      setIsChecking(false);
       toast({
         variant: 'destructive',
         title: 'Error',
@@ -74,7 +87,6 @@ export const ProtectedRoute = ({ children }) => {
     }
   };
 
-  // ✅ If user is logged in OR hotel password is verified, return children
   if (isVerified) {
     return children;
   }
@@ -89,16 +101,21 @@ export const ProtectedRoute = ({ children }) => {
           <div className="space-y-4">
             <Input
               type="password"
-              placeholder="Enter password"
+              placeholder={isChecking ? "Checking..." : "Enter password"}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="w-full"
+              disabled={isChecking}
               onKeyDown={(e) => {
-                if (e.key === 'Enter') verifyPassword();
+                if (e.key === 'Enter' && !isChecking) verifyPassword();
               }}
             />
-            <Button onClick={verifyPassword} className="w-full">
-              Verify Password
+            <Button 
+              onClick={() => verifyPassword()} 
+              className="w-full"
+              disabled={isChecking}
+            >
+              {isChecking ? 'Verifying...' : 'Verify Password'}
             </Button>
             {error && (
               <Alert variant="destructive">
