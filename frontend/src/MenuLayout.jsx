@@ -269,19 +269,36 @@ const MenuLayout = ({ isblock }) => {
 
     return (
         <div className="container mx-auto">
+            <div className='flex justify-between  mt-4 mb-2 lg:mt-6'>
+                <Button
+                    onClick={handleBack}
+                    variant="ghost"
+                    className="flex items-center gap-2 italic text-sm shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
+                >
+                    <ArrowLeft className="h-4 w-4" />
+                    Back to Resturants
+                </Button>
+                <div className="flex items-center gap-2">
+                    <h1 className="italic capitalize">{hotelName}</h1>
+                    <span>/</span>
+                    <h1 className="italic capitalize">{roomName}</h1>
+                    <span>/</span>
+                    <div className="font-bold text-center hidden lg:block"> Chatora Squad</div>
+                    <span>-</span>
+                    <div className="font-bold text-center hidden lg:block"><span className="text-orange-700">Menu</span></div>
+                </div>
+                <Button
+                    variant="outline"
+                    onClick={() => navigate(`/${hotelName}/${roomName}/orders`)}
+                    className="flex items-center gap-2 lowercase shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
+                >
+                    <span className='capitalize italic'>{roomName}</span> Orders
+                </Button>
+            </div>
 
-            <Button
-                onClick={handleBack}
-                variant="ghost"
-                className="flex items-center gap-2 mt-4 mb-2 lg:mt-6 italic text-sm"
-            >
-                <ArrowLeft className="h-4 w-4" />
-                Back to Resturants
-            </Button>
-            <div className="text-3xl font-bold text-center lg:my-6 hidden lg:block">Chatora Squad / <span className="text-orange-700">Menu</span></div>
             <div className="px-4 lg:px-20 min-h-screen">
                 {/* Search Bar */}
-                <div className="mb-6 sticky -top-1 z-10 bg-white lg:backdrop-blur-md p-4 rounded-lg lg:shadow-md">
+                <div className="mb-6 sticky -top-1 z-10 bg-white lg:backdrop-blur-md p-4 rounded-lg">
                     <div className="relative">
                         <Input
                             type="text"
@@ -290,7 +307,7 @@ const MenuLayout = ({ isblock }) => {
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 pr-4 py-2 w-full"
                         />
-                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
                     </div>
                 </div>
 
@@ -369,7 +386,7 @@ const MenuLayout = ({ isblock }) => {
                                                                     alt={item.name}
                                                                     className="w-full sm:w-24 h-40 sm:h-24 rounded-lg object-cover"
                                                                 /> */}
-                                                                 <ImageSlider images={item?.images} />
+                                                                <ImageSlider images={item?.images} />
                                                                 <div className="flex-1 w-full">
                                                                     <div className="flex justify-between items-start">
                                                                         <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
@@ -503,7 +520,7 @@ const MenuLayout = ({ isblock }) => {
                                                         /> */}
                                                         <div className="w-full">
 
-                                                         <ImageSlider images={item?.images} />
+                                                            <ImageSlider images={item?.images} />
                                                         </div>
                                                         <div className="flex-1">
                                                             <div className="flex justify-between items-start">

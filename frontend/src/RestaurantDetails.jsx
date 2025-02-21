@@ -24,6 +24,20 @@ const RestaurantDetails = () => {
   return (
     <>
       <div className="container mx-auto py-8 px-4">
+        <div className='flex justify-between'>
+          <div className='flex gap-2'>
+            <h1 className="italic capitalize">{hotelName}</h1>
+            <span>/</span>
+            <h1 className="italic capitalize font-bold text-orange-700">{roomName}</h1>
+          </div>
+          <Button
+            variant="outline"
+            onClick={() => navigate(`/${hotelName}/${roomName}/orders`)}
+            className="flex items-center gap-2 lowercase shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
+          >
+            <span className='capitalize italic'>{roomName}</span> Orders
+          </Button>
+        </div>
         <div className='mb-8'>
           <h1 className="text-3xl font-bold mb-8">Our Restaurants</h1>
           <RestLayout
