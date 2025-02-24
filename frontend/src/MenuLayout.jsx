@@ -392,7 +392,6 @@ const MenuLayout = ({ isblock }) => {
                                                                         <h3 className="font-semibold text-lg sm:text-xl">{item.name}</h3>
                                                                         <span className="font-semibold text-gray-700">₹{item.discountedPrice}</span>
                                                                     </div>
-                                                                    <p className="text-gray-600 text-sm mt-1">{item.description}</p>
                                                                     <div className="mt-4">
                                                                         {getItemQuantity(item._id) > 0 ? (
                                                                             <div className="flex items-center gap-2">
@@ -527,7 +526,6 @@ const MenuLayout = ({ isblock }) => {
                                                                 <h3 className="font-semibold">{item?.name}</h3>
                                                                 <span className="font-semibold">₹{item?.discountedPrice}</span>
                                                             </div>
-                                                            <p className="text-sm text-gray-600 mt-1">{item?.description}</p>
                                                             <div className="mt-2">
                                                                 {getItemQuantity(item?._id) > 0 ? (
                                                                     <div className="flex items-center gap-2">
