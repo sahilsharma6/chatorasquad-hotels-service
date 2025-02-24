@@ -9,6 +9,8 @@ import { useOrder } from './Context/OrderContext';
 import { Skeleton } from './components/ui/skeleton';
 import DownloadInvoice from './components/DownloadInvoice';
 
+import companyLogo from '/company_logo.png';
+
 const OrdersPage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const { hotelName, roomName } = useParams();
@@ -61,6 +63,7 @@ const OrdersPage = () => {
             day: 'numeric',
             hour: 'numeric',
             minute: 'numeric',
+            
             hour12: true
         });
     };
@@ -141,7 +144,7 @@ const OrdersPage = () => {
                                 <Badge className={`${getStatusColor(order?.status)} text-white`}>
                                     {order?.status}
                                 </Badge>
-                                <DownloadInvoice order={order} />
+                                <DownloadInvoice order={order} companyLogo={companyLogo} />
                             </div>
                         </div>
                     </CardHeader>
