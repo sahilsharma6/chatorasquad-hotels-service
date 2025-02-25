@@ -50,7 +50,8 @@ const DownloadInvoice = ({ order, companyLogo }) => {
   
     doc.text("Bill To:", margin + 2, y + 5)
     doc.text(`Room: ${order?.roomId?.room || "Unknown Room"}`, margin + 2, y + 12)
-    doc.text(`Guest Name: ${order?.guestName || "N/A"}`, margin + 2, y + 19)
+    doc.text(`Guest Name: ${order?.name || "N/A"}`, margin + 2, y + 19)
+    doc.text(`Guest Phone: ${order?.phoneNo || "N/A"}`, margin + 2, y + 26)
   
     doc.text("Invoice Details:", midPoint + 2, y + 5)
     doc.text(`No: ${order?._id?.slice(-6) || "N/A"}`, midPoint + 2, y + 12)
