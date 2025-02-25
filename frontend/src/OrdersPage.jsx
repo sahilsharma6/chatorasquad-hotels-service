@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Building } from 'lucide-react';
@@ -17,35 +17,47 @@ const OrdersPage = () => {
   const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms } = useHotel();
   const { fetchOrderByRoom, orders } = useOrder();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
+  const fetchData = useCallback(async () => {
+    if (!hotelName || !roomName) {
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('Fetching data for hotel:', hotelName, 'room:', roomName);
+    setIsLoading(true);
+    try {
+
+      // Fetch hotel by name
       await fetchHotelByName(hotelName);
-    };
-    fetchData();
-  }, [hotelName]);
+      console.log('Hotel Details:', HotelDetailsByName);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
       if (HotelDetailsByName?._id) {
+        // Fetch rooms for the hotel
         await fetchHotelRooms(HotelDetailsByName._id);
+        console.log('Rooms:', Rooms);
+
+        if (Rooms?.length > 0) {
+          // Find the current room and fetch its orders
+          const currentRoom = Rooms.find((room) => room.room === roomName);
+          console.log('Current Room:', currentRoom);
+          if (currentRoom?._id) {
+            await fetchOrderByRoom(currentRoom._id);
+            console.log('Orders for room:', orders);
+          } else {
+            console.warn('No room found with name:', roomName);
+          }
+        }
       }
-    };
-    fetchRooms();
-  }, [HotelDetailsByName?._id]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [hotelName, roomName]);
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (Rooms?.length > 0 && roomName) {
-        const currentRoom = Rooms.find((room) => room.room === roomName);
-        if (currentRoom?._id) {
-          await fetchOrderByRoom(currentRoom._id);
-        }
-        setIsLoading(false);
-      }
-    };
-    fetchOrders();
-  }, [Rooms, roomName]);
+    fetchData();
+  }, [fetchData]);
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -119,7 +131,7 @@ const OrdersPage = () => {
     if (!orders || !Array.isArray(orders) || orders.length === 0) {
       return (
         <Card className="p-4 sm:p-6 text-center text-gray-500 w-full">
-          No orders found
+          No orders found for the selected hotel and room.
         </Card>
       );
     }
