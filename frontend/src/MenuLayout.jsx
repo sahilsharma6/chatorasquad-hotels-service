@@ -18,7 +18,7 @@ import ImageSlider from "./components/ImageSlider"
 
 
 // Constants
-const TAX_RATE = 0.18
+const TAX_RATE = 0.05; // 5% GST
 const DELIVERY_FEE = 50
 
 const MenuLayout = ({ isblock }) => {
@@ -160,8 +160,19 @@ const MenuLayout = ({ isblock }) => {
     }
 
     const getSubtotal = () => {
-        return cart.reduce((total, item) => total + item.discountedPrice * item.quantity, 0)
-    }
+        return cart.reduce((total, item) => total + item.discountedPrice * item.quantity, 0);
+    };
+
+    const getGSTAmount = () => {
+        return getSubtotal() * TAX_RATE;
+    };
+
+    const getTotalWithGST = () => {
+        return getSubtotal() + getGSTAmount();
+    };
+
+    // console.log(getTotalWithGST());
+
 
     const scrollToCategory = (categoryId) => {
         setIsScrolling(true)
@@ -201,7 +212,7 @@ const MenuLayout = ({ isblock }) => {
         })),
         hotelId: hotelId,
         roomId: RoomId,
-        totalAmount: getSubtotal()
+        totalAmount: getTotalWithGST()
     }
 
     //   console.log(filteredItems.filter((item) => item?.category));
@@ -269,30 +280,30 @@ const MenuLayout = ({ isblock }) => {
 
     return (
         <div className="container mx-auto">
-            <div className='flex justify-between  mt-4 mb-2 lg:mt-6'>
+            <div className="flex justify-between mt-4 mx-5 mb-2 lg:mt-6">
                 <Button
                     onClick={handleBack}
                     variant="ghost"
-                    className="flex items-center gap-2 italic text-sm shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
+                    className="hidden lg:flex items-center gap-2 italic text-sm shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
                 >
                     <ArrowLeft className="h-4 w-4" />
-                    Back to Resturants
+                    Back to Restaurants
                 </Button>
                 <div className="flex items-center gap-2">
-                    <h1 className="italic capitalize">{hotelName}</h1>
-                    <span>/</span>
                     <h1 className="italic capitalize">{roomName}</h1>
                     <span>/</span>
-                    <div className="font-bold text-center hidden lg:block"> Chatora Squad</div>
-                    <span>-</span>
-                    <div className="font-bold text-center hidden lg:block"><span className="text-orange-700">Menu</span></div>
+                    <div className="font-bold text-center hidden lg:block">Chatora Squad</div>
+                    <span>ChatoraSquad</span>
+                    <div className="font-bold text-center hidden lg:block">
+                        <span className="text-orange-700">Menu</span>
+                    </div>
                 </div>
                 <Button
                     variant="outline"
                     onClick={() => navigate(`/${hotelName}/${roomName}/orders`)}
                     className="flex items-center gap-2 lowercase shadow-none border-b border-t-transparent border-l-transparent border-r-transparent rounded-none hover:rounded-md border-b-orange-300"
                 >
-                    <span className='capitalize italic'>{roomName}</span> Orders
+                    <span className="capitalize italic">{roomName}</span> Orders
                 </Button>
             </div>
 
@@ -472,16 +483,24 @@ const MenuLayout = ({ isblock }) => {
                                                     </div>
                                                     <div className="text-right">
                                                         <p className="font-semibold">
-                                                            ₹{(item?.discountedPrice) * item?.quantity}
+                                                            ₹{(item?.discountedPrice * item?.quantity).toFixed(2)}
                                                         </p>
                                                     </div>
                                                 </motion.div>
                                             ))}
                                         </div>
                                         <div className="border-t pt-4 space-y-2">
+                                            <div className="flex justify-between">
+                                                <span>Subtotal</span>
+                                                <span>₹{getSubtotal().toFixed(2)}</span>
+                                            </div>
+                                            <div className="flex justify-between">
+                                                <span>GST (5%)</span>
+                                                <span>₹{getGSTAmount().toFixed(2)}</span>
+                                            </div>
                                             <div className="flex justify-between font-bold text-lg">
                                                 <span>Total</span>
-                                                <span>₹{getSubtotal().toFixed(2)}</span>
+                                                <span>₹{getTotalWithGST().toFixed(2)}</span>
                                             </div>
                                         </div>
                                         <Button
@@ -627,23 +646,31 @@ const MenuLayout = ({ isblock }) => {
                                                 </div>
                                                 <div className="text-right">
                                                     <p className="font-semibold">
-                                                        ₹{item?.discountedPrice}
+                                                        ₹{(item?.discountedPrice * item?.quantity).toFixed(2)}
                                                     </p>
                                                 </div>
                                             </motion.div>
                                         ))}
                                     </div>
                                     <div className="border-t pt-4 space-y-2">
+                                        <div className="flex justify-between">
+                                            <span>Subtotal</span>
+                                            <span>₹{getSubtotal().toFixed(2)}</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span>GST (5%)</span>
+                                            <span>₹{getGSTAmount().toFixed(2)}</span>
+                                        </div>
                                         <div className="flex justify-between font-bold text-lg">
                                             <span>Total</span>
-                                            <span>₹{getSubtotal().toFixed(2)}</span>
+                                            <span>₹{getTotalWithGST().toFixed(2)}</span>
                                         </div>
                                     </div>
                                     <Button
                                         className="w-full mt-6 bg-orange-500 hover:bg-orange-600 text-white"
                                         onClick={() => {
-                                            setIsCartModalOpen(false)
-                                            setIsCheckoutModalOpen(true)
+                                            setIsCartModalOpen(false);
+                                            setIsCheckoutModalOpen(true);
                                         }}
                                         disabled={cart.length === 0}
                                     >
