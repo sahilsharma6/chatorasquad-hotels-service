@@ -106,6 +106,11 @@ export const HotelProvider = ({ children }) => {
     }
   };
 
+  const resetHotel = () => {
+    setHotelDetails(null);
+    setRooms([]);
+  };
+
   const value = {
     hotels,
     loading,
@@ -118,7 +123,8 @@ export const HotelProvider = ({ children }) => {
     Rooms,
     VerifyPassword,
     fetchHotelByName,
-    HotelDetailsByName
+    HotelDetailsByName,
+    resetHotel
   };
 
   return (
