@@ -116,8 +116,8 @@ const DashboardLayout = () => {
           <NavItem icon={< Hotel size={20} />}
           label={'Orders'}
           isOpen={isOpen}
-          path={'/' + hotelName + '/profile/orders/?token=' + tok} 
-          pathname={'/' + hotelName + '/profile/orders'} 
+          path={'/' + hotelName + '/profile/order/?token=' + tok} 
+          pathname={'/' + hotelName + '/profile/order'} 
           />
         </nav>
       </div>
@@ -156,7 +156,7 @@ const DashboardLayout = () => {
           <Routes>
             <Route path='/' element={<Profile />} />
             <Route path='/room' element={<Room user={user} />} />
-            <Route path='/orders' element={<HotelOrders />} />
+            <Route path='/order' element={<HotelOrders />} />
             {/* <Route path='/kitchen' element={<Kittchen />} /> */}
           </Routes>
         </main>
