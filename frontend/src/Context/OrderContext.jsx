@@ -64,9 +64,11 @@ export const OrderProvider = ({ children }) => {
         }
     };
 
-
+    const resetOrders = () => {
+        setOrders([]);
+      };
     return (
-        <OrderContext.Provider value={{ fetchOrderByRoom, orders, CurrentOrders, CreateOrder }}>
+        <OrderContext.Provider value={{resetOrders, fetchOrderByRoom, orders, CurrentOrders, CreateOrder }}>
             {children}
         </OrderContext.Provider>
     );

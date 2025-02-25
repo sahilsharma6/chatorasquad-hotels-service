@@ -14,8 +14,20 @@ import companyLogo from '/company_logo.png';
 const OrdersPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { hotelName, roomName } = useParams();
-  const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms } = useHotel();
-  const { fetchOrderByRoom, orders } = useOrder();
+  const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms, resetHotel } = useHotel();
+  const { fetchOrderByRoom, orders, resetOrders } = useOrder();
+
+  const fetchWithRetry = async (fn, retries = 3, delay = 1000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        console.warn(`Retry ${i + 1} of ${retries} after ${delay * Math.pow(2, i)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      }
+    }
+  };
 
   const fetchData = useCallback(async () => {
     if (!hotelName || !roomName) {
@@ -26,26 +38,35 @@ const OrdersPage = () => {
     console.log('Fetching data for hotel:', hotelName, 'room:', roomName);
     setIsLoading(true);
     try {
+      // Reset caches to ensure fresh data
+      resetHotel();
+      resetOrders();
 
       // Fetch hotel by name
-      await fetchHotelByName(hotelName);
+      await fetchWithRetry(() => fetchHotelByName(hotelName));
       console.log('Hotel Details:', HotelDetailsByName);
 
       if (HotelDetailsByName?._id) {
         // Fetch rooms for the hotel
-        await fetchHotelRooms(HotelDetailsByName._id);
+        await fetchWithRetry(() => fetchHotelRooms(HotelDetailsByName._id));
         console.log('Rooms:', Rooms);
 
         if (Rooms?.length > 0) {
-          // Find the current room and fetch its orders
+          // Find the current room and ensure it matches roomName
           const currentRoom = Rooms.find((room) => room.room === roomName);
           console.log('Current Room:', currentRoom);
+
           if (currentRoom?._id) {
-            await fetchOrderByRoom(currentRoom._id);
+            // Fetch orders for the specific room
+            await fetchWithRetry(() => fetchOrderByRoom(currentRoom._id));
             console.log('Orders for room:', orders);
           } else {
             console.warn('No room found with name:', roomName);
+            resetOrders(); // Clear orders if no room is found
           }
+        } else {
+          console.warn('No rooms found for hotel:', hotelName);
+          resetOrders(); // Clear orders if no rooms exist
         }
       }
     } catch (error) {
@@ -53,11 +74,18 @@ const OrdersPage = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [hotelName, roomName]);
+  }, [hotelName, roomName, fetchHotelByName, fetchHotelRooms, fetchOrderByRoom, resetHotel, resetOrders]); // Keep dependencies, but ensure memoization in contexts
 
   useEffect(() => {
     fetchData();
-  }, [fetchData]);
+
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      resetHotel();
+      resetOrders();
+      setIsLoading(false);
+    };
+  }, [hotelName, roomName]); // Only trigger on hotelName or roomName changes
 
   const getStatusColor = (status) => {
     const statusColors = {
