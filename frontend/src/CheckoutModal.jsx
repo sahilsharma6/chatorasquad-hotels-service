@@ -163,16 +163,8 @@ const CheckoutModal = ({
                   <div className="space-y-2">
                     <div className="space-y-1">
                       <div className="flex justify-between">
-                        <Label>Subtotal</Label>
-                        <span>₹{getSubtotal().toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between">
-                        <Label>GST (5%)</Label>
-                        <span>₹{getGSTAmount().toFixed(2)}</span>
-                      </div>
-                      <div className="flex justify-between font-bold">
                         <Label>Total Amount</Label>
-                        <span>₹{getTotalWithGST().toFixed(2)}</span>
+                        <span>₹{getSubtotal().toFixed(2)}</span>
                       </div>
                     </div>
                     <div
