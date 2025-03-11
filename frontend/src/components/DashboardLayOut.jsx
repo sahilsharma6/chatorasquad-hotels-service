@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Bell, Home, Building2, Menu, X, Hotel } from 'lucide-react';
+import { Bell, Home, Building2, Menu, X, Hotel, CircleUser } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -116,8 +116,8 @@ const DashboardLayout = () => {
           <NavItem icon={< Hotel size={20} />}
           label={'Orders'}
           isOpen={isOpen}
-          path={'/' + hotelName + '/profile/orders/?token=' + tok} 
-          pathname={'/' + hotelName + '/profile/orders'} 
+          path={'/' + hotelName + '/profile/order/?token=' + tok} 
+          pathname={'/' + hotelName + '/profile/order'} 
           />
         </nav>
       </div>
@@ -144,10 +144,10 @@ const DashboardLayout = () => {
             <Button variant="ghost" size="icon">
               <Bell size={20} />
             </Button>
-            <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" />
-              <AvatarFallback>CN</AvatarFallback>
-            </Avatar>
+            {/* <Avatar> */}
+             <CircleUser size={56} />
+              {/* <AvatarFallback>CN</AvatarFallback> */}
+            {/* </Avatar> */}
           </div>
         </header>
 
@@ -156,7 +156,7 @@ const DashboardLayout = () => {
           <Routes>
             <Route path='/' element={<Profile />} />
             <Route path='/room' element={<Room user={user} />} />
-            <Route path='/orders' element={<HotelOrders />} />
+            <Route path='/order' element={<HotelOrders />} />
             {/* <Route path='/kitchen' element={<Kittchen />} /> */}
           </Routes>
         </main>
