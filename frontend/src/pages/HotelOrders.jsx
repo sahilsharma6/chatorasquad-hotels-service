@@ -5,8 +5,8 @@ import HotelOrderTable from '../components/Hotel/HotelOrderTable';
 import OrdersCard from '@/components/Hotel/OrdersCard';
 import apiClient from '../services/ApiClient';
 
-const HotelOrders= ()=>{
-     // Sample data
+const HotelOrders = () => {
+  // Sample data
   const initialOrders = [
     {
       id: '67a37edb93f167c2b7f4eeaa',
@@ -21,7 +21,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543210',
-      resturantName:'anc'
+      resturantName: 'anc'
     },
     {
       id: '67a37edb93f167c2b7f4eeab',
@@ -36,7 +36,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543211',
-      resturantName:'anc'
+      resturantName: 'anc'
     },
     {
       id: '67a373e893f167c2b7f4e9f5',
@@ -51,7 +51,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543212',
-      resturantName:'anc'
+      resturantName: 'anc'
     },
     {
       id: '67a37267a3f167c2b7f4e872',
@@ -66,7 +66,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543213',
-      resturantName:'anc'
+      resturantName: 'anc'
     },
     {
       id: '67a3710a93f167c2b7f4e6d6',
@@ -81,7 +81,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543214',
-      resturantName:'anc'
+      resturantName: 'anc'
     },
     {
       id: '67a370a893f167c2b7f4e686',
@@ -96,7 +96,7 @@ const HotelOrders= ()=>{
       customerName: 'Jatin Mehra',
       email: 'admin@example.com',
       phoneNo: '+91 9876543215',
-      resturantName:'anc'
+      resturantName: 'anc'
     }
   ];
 
@@ -106,19 +106,41 @@ const HotelOrders= ()=>{
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
-  useEffect(()=>{
+  useEffect(() => {
     try {
-      async function fetchHotelOrders(){
-        const response = await apiClient.get('/hotel/get/orders');
+      async function fetchHotelOrders() {
+        const response = await apiClient.get('/hotel/orders/hotel');
         console.log(response.data);
+        const hotelName = "Sample Hotel"; // Replace with actual hotel name
+        const restaurantName = "ChatoraSquad's Restaurant"; // Replace with actual restaurant name
+        const email = "admin@example.com"; // Replace with actual email if available
+        const outputData = response.data.map(order => {
+          const orderDate = new Date(order.orderDate);
+          return {
+            id: order._id,
+            dishName: order.orderItems[0]?.menuItem.name || 'Unknown Dish', // Default if menuItem is null
+            roomName: order.roomId.room,
+            hotelName: hotelName,
+            value: order.totalPrice,
+            date: orderDate.toISOString().split('T')[0], // Format date as YYYY-MM-DD
+            time: orderDate.toTimeString().split(' ')[0].substring(0, 5), // Format time as HH:MM
+            orderStatus: order.status,
+            paymentStatus: 'pending', // Assuming payment status is unknown
+            customerName: order.name,
+            email: email,
+            phoneNo: order.phoneNo,
+            resturantName: restaurantName
+          };
+        });
+        console.log(outputData);
         
-        // setOrders(data);
+        setOrders(outputData.reverse());
       }
       fetchHotelOrders();
     } catch (error) {
-      
+
     }
-  },[])
+  }, [])
   // Sort function
   const requestSort = (key) => {
     let direction = 'ascending';
@@ -131,20 +153,20 @@ const HotelOrders= ()=>{
   // Filtered and sorted orders
   const getFilteredAndSortedOrders = () => {
     let filteredOrders = [...orders];
-    
+
     // Apply search filter
     if (searchTerm) {
-      filteredOrders = filteredOrders.filter(order => 
+      filteredOrders = filteredOrders.filter(order =>
         order.dishName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.roomName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.hotelName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.date.includes(searchTerm) ||
         order.time.includes(searchTerm) ||
         order.value.toString().includes(searchTerm) ||
-        order.resturantName.toString().includes(searchTerm) 
+        order.resturantName.toString().includes(searchTerm)
       );
     }
-    
+
     // Apply sorting
     if (sortConfig.key) {
       filteredOrders.sort((a, b) => {
@@ -157,14 +179,14 @@ const HotelOrders= ()=>{
         return 0;
       });
     }
-    
+
     return filteredOrders;
   };
 
   // Handle order status update
   const updateOrderStatus = (id, newStatus) => {
-    setOrders(orders.map(order => 
-      order.id === id ? {...order, orderStatus: newStatus} : order
+    setOrders(orders.map(order =>
+      order.id === id ? { ...order, orderStatus: newStatus } : order
     ));
   };
 
@@ -177,8 +199,8 @@ const HotelOrders= ()=>{
 
   const itemVariants = {
     hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
+    visible: {
+      y: 0,
       opacity: 1,
       transition: {
         type: 'spring',
@@ -191,53 +213,52 @@ const HotelOrders= ()=>{
     <div className="bg-gray-50 min-h-screen py-4">
       <div className="max-w-full mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
         {/* Header */}
-      
-        
+
+
         {/* Search and Filter */}
-       <SearchFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} indexOfFirstItem={indexOfFirstItem} indexOfLastItem={indexOfFirstItem} getFilteredAndSortedOrders={getFilteredAndSortedOrders} />
-        
+        <SearchFilter searchTerm={searchTerm} setSearchTerm={setSearchTerm} indexOfFirstItem={indexOfFirstItem} indexOfLastItem={indexOfFirstItem} getFilteredAndSortedOrders={getFilteredAndSortedOrders} />
+
         {/* Desktop Table View */}
-       <HotelOrderTable requestSort={requestSort} currentItems={currentItems} updateOrderStatus={updateOrderStatus} itemVariants={itemVariants} />
-        
+        <HotelOrderTable requestSort={requestSort} currentItems={currentItems} updateOrderStatus={updateOrderStatus} itemVariants={itemVariants} />
+
         {/* Mobile Card View */}
-       <OrdersCard currentItems={currentItems} updateOrderStatus={updateOrderStatus} itemVariants={itemVariants} />
-        
+        <OrdersCard currentItems={currentItems} updateOrderStatus={updateOrderStatus} itemVariants={itemVariants} />
+
         {/* Pagination */}
         <div className="px-6 py-4 flex justify-between items-center border-t">
           <button
             onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded-md border ${currentPage === 1 
-              ? 'text-gray-400 border-gray-200' 
+            className={`px-3 py-1 rounded-md border ${currentPage === 1
+              ? 'text-gray-400 border-gray-200'
               : 'text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             Previous
           </button>
-          
+
           <div className="flex space-x-1">
             {Array.from({ length: totalPages }).map((_, index) => (
               <button
                 key={index}
                 onClick={() => setCurrentPage(index + 1)}
-                className={`w-8 h-8 flex items-center justify-center rounded-md ${
-                  currentPage === index + 1
+                className={`w-8 h-8 flex items-center justify-center rounded-md ${currentPage === index + 1
                     ? 'bg-orange-600 text-white'
                     : 'text-gray-700 hover:bg-gray-100'
-                }`}
+                  }`}
               >
                 {index + 1}
               </button>
             ))}
           </div>
-          
+
           <button
             onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded-md border ${currentPage === totalPages 
-              ? 'text-gray-400 border-gray-200' 
+            className={`px-3 py-1 rounded-md border ${currentPage === totalPages
+              ? 'text-gray-400 border-gray-200'
               : 'text-gray-700 border-gray-300 hover:bg-gray-50'
-            }`}
+              }`}
           >
             Next
           </button>

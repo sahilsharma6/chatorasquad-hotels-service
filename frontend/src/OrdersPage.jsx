@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Clock, MapPin, Building } from 'lucide-react';
@@ -14,38 +14,78 @@ import companyLogo from '/company_logo.png';
 const OrdersPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { hotelName, roomName } = useParams();
-  const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms } = useHotel();
-  const { fetchOrderByRoom, orders } = useOrder();
+  const { fetchHotelByName, HotelDetailsByName, fetchHotelRooms, Rooms, resetHotel } = useHotel();
+  const { fetchOrderByRoom, orders, resetOrders } = useOrder();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setIsLoading(true);
-      await fetchHotelByName(hotelName);
-    };
-    fetchData();
-  }, [hotelName]);
+  const fetchWithRetry = async (fn, retries = 3, delay = 1000) => {
+    for (let i = 0; i < retries; i++) {
+      try {
+        return await fn();
+      } catch (error) {
+        if (i === retries - 1) throw error;
+        console.warn(`Retry ${i + 1} of ${retries} after ${delay * Math.pow(2, i)}ms...`);
+        await new Promise(resolve => setTimeout(resolve, delay * Math.pow(2, i)));
+      }
+    }
+  };
 
-  useEffect(() => {
-    const fetchRooms = async () => {
+  const fetchData = useCallback(async () => {
+    if (!hotelName || !roomName) {
+      setIsLoading(false);
+      return;
+    }
+
+    console.log('Fetching data for hotel:', hotelName, 'room:', roomName);
+    setIsLoading(true);
+    try {
+      // Reset caches to ensure fresh data
+      resetHotel();
+      resetOrders();
+
+      // Fetch hotel by name
+      await fetchWithRetry(() => fetchHotelByName(hotelName));
+      console.log('Hotel Details:', HotelDetailsByName);
+
       if (HotelDetailsByName?._id) {
-        await fetchHotelRooms(HotelDetailsByName._id);
+        // Fetch rooms for the hotel
+        await fetchWithRetry(() => fetchHotelRooms(HotelDetailsByName._id));
+        console.log('Rooms:', Rooms);
+
+        if (Rooms?.length > 0) {
+          // Find the current room and ensure it matches roomName
+          const currentRoom = Rooms.find((room) => room.room === roomName);
+          console.log('Current Room:', currentRoom);
+
+          if (currentRoom?._id) {
+            // Fetch orders for the specific room
+            await fetchWithRetry(() => fetchOrderByRoom(currentRoom._id));
+            console.log('Orders for room:', orders);
+          } else {
+            console.warn('No room found with name:', roomName);
+            resetOrders(); // Clear orders if no room is found
+          }
+        } else {
+          console.warn('No rooms found for hotel:', hotelName);
+          resetOrders(); // Clear orders if no rooms exist
+        }
       }
-    };
-    fetchRooms();
-  }, [HotelDetailsByName?._id]);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [hotelName, roomName, fetchHotelByName, fetchHotelRooms, fetchOrderByRoom, resetHotel, resetOrders]); // Keep dependencies, but ensure memoization in contexts
 
   useEffect(() => {
-    const fetchOrders = async () => {
-      if (Rooms?.length > 0 && roomName) {
-        const currentRoom = Rooms.find((room) => room.room === roomName);
-        if (currentRoom?._id) {
-          await fetchOrderByRoom(currentRoom._id);
-        }
-        setIsLoading(false);
-      }
+    fetchData();
+
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      resetHotel();
+      resetOrders();
+      setIsLoading(false);
     };
-    fetchOrders();
-  }, [Rooms, roomName]);
+  }, [hotelName, roomName]); // Only trigger on hotelName or roomName changes
 
   const getStatusColor = (status) => {
     const statusColors = {
@@ -119,7 +159,7 @@ const OrdersPage = () => {
     if (!orders || !Array.isArray(orders) || orders.length === 0) {
       return (
         <Card className="p-4 sm:p-6 text-center text-gray-500 w-full">
-          No orders found
+          No orders found for the selected hotel and room.
         </Card>
       );
     }
