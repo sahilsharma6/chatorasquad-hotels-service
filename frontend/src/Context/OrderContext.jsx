@@ -37,8 +37,8 @@ export const OrderProvider = ({ children }) => {
                 hotelId,
                 roomId,
                 orderItems,
-                // name: name, 
-                // phoneNo: phoneNo,
+                name: name, 
+                phoneNo: phoneNo,
             };
 
             // console.log('order items context',formattedOrderData);

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, ArrowUpDown, Check, X, AlertCircle, Clock } from 'lucide-react';
 import SearchFilter from '../components/Hotel/SearchFilter'
 import HotelOrderTable from '../components/Hotel/HotelOrderTable';
 import OrdersCard from '@/components/Hotel/OrdersCard';
@@ -110,9 +109,12 @@ const HotelOrders= ()=>{
   useEffect(()=>{
     try {
       async function fetchHotelOrders(){
-        const response = await apiClient.get('/hotel/orders');
-        setOrders(data);
+        const response = await apiClient.get('/hotel/get/orders');
+        console.log(response.data);
+        
+        // setOrders(data);
       }
+      fetchHotelOrders();
     } catch (error) {
       
     }
